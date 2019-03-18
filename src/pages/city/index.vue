@@ -19,37 +19,27 @@
 
     <el-table
       v-loading="listLoading"
-      :key="tableKey"
+      :key="index"
       :data="list"
       border
       fit
       highlight-current-row
       style="width: 100%;"
       @sort-change="sortChange">
-      <el-table-column :label="$t('table.id')" prop="id" sortable="custom" align="center" width="75px">
+      <!-- <el-table-column :label="$t('table.id')" prop="id" sortable="custom" align="center" width="75px">
         <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
-        </template>
-      </el-table-column>
-      <!-- <el-table-column :label="$t('table.date')" width="150px" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ index }}</span>
         </template>
       </el-table-column> -->
       <el-table-column :label="$t('标题')" min-width="150px">
         <template slot-scope="scope">
-          <span class="link-type" @click="handleUpdate(scope.row)">{{ scope.row.title }}</span>
-          <el-tag>{{ scope.row.type | typeFilter }}</el-tag>
+          <span class="link-type" >{{ scope.title }}</span>
+          <el-tag>{{ scope.title }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('类型')" width="110px" align="center">
+      <!-- <el-table-column :label="$t('类型')" width="110px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.author }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column v-if="showReviewer" :label="$t('标签')" width="110px" align="center">
-        <template slot-scope="scope">
-          <span style="color:red;">{{ scope.row.reviewer }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('专题分类')" width="80px">
@@ -75,22 +65,13 @@
           <span v-else>0</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column :label="$t('table.status')" class-name="status-col" width="100">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
-        </template>
-      </el-table-column> -->
       <el-table-column :label="$t('操作')" align="center" width="200px" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <!-- <el-button v-if="scope.row.status!='published'" size="mini" type="success" @click="handleModifyStatus(scope.row,'published')">{{ $t('table.publish') }}
-          </el-button> -->
-          <!-- <el-button v-if="scope.row.status!='draft'" size="mini" @click="handleModifyStatus(scope.row,'draft')">{{ $t('table.draft') }}
-          </el-button> -->
           <el-button size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">{{ $t('table.delete') }}
           </el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
@@ -144,6 +125,7 @@ import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // Waves directive
 import { parseTime } from '@/utils'
 import { request } from '@/utils/req.js'
+import { obj2formdatastr } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 const calendarTypeOptions = [
@@ -238,8 +220,17 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      request('/sg/department/sgMainDepartment/search?page=0&size=10').then(data => {
-        console.log(20190318150721, data)
+      let params = obj2formdatastr({
+          month: '201812',
+          pageNumber: '1',
+          pageSize: '10',
+          state: '11',
+          property: 'acceptTime',
+          direction: 'DESC',
+      })
+      request('/sg/citymanagement/findByPage?' + params).then(data => {
+        console.log(20190318150721, data.content)
+        this.list = data.content
 
         // Just to simulate the time of the request
         setTimeout(() => {

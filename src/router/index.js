@@ -80,19 +80,19 @@ export const constantRouterMap = [
     ]
   },
   // 文档
-  {
-    path: '/documentation',
-    component: Layout,
-    redirect: '/documentation/index',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/documentation/index'),
-        name: 'Documentation',
-        meta: { title: 'documentation', icon: 'documentation', affix: true }
-      }
-    ]
-  },
+  // {
+  //   path: '/documentation',
+  //   component: Layout,
+  //   redirect: '/documentation/index',
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/documentation/index'),
+  //       name: 'Documentation',
+  //       meta: { title: 'documentation', icon: 'documentation', affix: true }
+  //     }
+  //   ]
+  // },
   // 城市管理
   {
     path: '/city',
@@ -101,7 +101,7 @@ export const constantRouterMap = [
     children: [
       {
         path: 'index',
-        component: () => import('@/views/table/complexTable'),
+        component: () => import('@/pages/city/index'),
         name: 'city',
         meta: { title: '城市管理', icon: 'guide', noCache: true }
       }
@@ -115,7 +115,7 @@ export const constantRouterMap = [
     children: [
       {
         path: 'index',
-        component: () => import('@/views/table/complexTable'),
+        component: () => import('@/pages/admn/index'),
         name: 'admn',
         meta: { title: '行政效能', icon: 'guide', noCache: true }
       }
@@ -129,7 +129,7 @@ export const constantRouterMap = [
     children: [
       {
         path: 'index',
-        component: () => import('@/views/table/complexTable'),
+        component: () => import('@/pages/envr/index'),
         name: 'envr',
         meta: { title: '环境保护', icon: 'guide', noCache: true }
       }
@@ -143,7 +143,7 @@ export const constantRouterMap = [
     children: [
       {
         path: 'index',
-        component: () => import('@/views/table/complexTable'),
+        component: () => import('@/pages/depa/index'),
         name: 'depa',
         meta: { title: '部门管理', icon: 'guide', noCache: true }
       }
@@ -157,7 +157,7 @@ export const constantRouterMap = [
     children: [
       {
         path: 'index',
-        component: () => import('@/views/table/complexTable'),
+        component: () => import('@/pages/account/index'),
         name: 'account',
         meta: { title: '账号管理', icon: 'guide', noCache: true }
       }
@@ -171,7 +171,7 @@ export const constantRouterMap = [
     children: [
       {
         path: 'index',
-        component: () => import('@/views/table/complexTable'),
+        component: () => import('@/pages/street/index'),
         name: 'street',
         meta: { title: '镇街管理', icon: 'guide', noCache: true }
       }
@@ -185,7 +185,7 @@ export const constantRouterMap = [
     children: [
       {
         path: 'index',
-        component: () => import('@/views/table/complexTable'),
+        component: () => import('@/pages/service/index'),
         name: 'service',
         meta: { title: '服务提供管控日志', icon: 'guide', noCache: true }
       }
@@ -199,7 +199,7 @@ export const constantRouterMap = [
     children: [
       {
         path: 'index',
-        component: () => import('@/views/table/complexTable'),
+        component: () => import('@/pages/matter/index'),
         name: 'matter',
         meta: { title: '事项管理', icon: 'guide', noCache: true }
       }
@@ -213,7 +213,7 @@ export const constantRouterMap = [
     children: [
       {
         path: 'index',
-        component: () => import('@/views/table/complexTable'),
+        component: () => import('@/pages/public/index'),
         name: 'public',
         meta: { title: '舆情分析配置', icon: 'guide', noCache: true }
       }
