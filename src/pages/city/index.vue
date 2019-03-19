@@ -1,80 +1,76 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
+      <el-row :gutter="10">
+        <el-col :span="6">
       ID查询：
-      <el-input :placeholder="$t('请输入订单编号')" v-model="listQuery.title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input placeholder="请输入订单编号" v-model="listQuery.id" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      
+        </el-col><el-col :span="5">
       名称：
-      <el-select v-model="listQuery.type" :placeholder="$t('请选择状态')" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key"/>
+      <el-select v-model="listQuery.state" placeholder="请选择名称" clearable class="filter-item" style="width: 130px" @change="getList">
+        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.label" :value="item.key"/>
       </el-select>
+      </el-col>
+      <el-col :span="5">
       当前专题：
-      <el-select v-model="listQuery.type" :placeholder="$t('请选择状态')" clearable style="width: 140px" class="filter-item" @change="handleFilter">
+      <el-select v-model="listQuery.type" placeholder="请选择专题" clearable style="width: 140px" class="filter-item" @change="changeTopics">
         <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
       </el-select>
+      </el-col>
+      <el-col :span="8">
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+      <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button> -->
       <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">{{ $t('table.export') }}</el-button>
-      <!-- <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">{{ $t('table.reviewer') }}</el-checkbox> -->
+      </el-col>
+      </el-row>
     </div>
 
     <el-table
       v-loading="listLoading"
-      :key="index"
       :data="list"
       border
       fit
       highlight-current-row
       style="width: 100%;"
       @sort-change="sortChange">
-      <!-- <el-table-column :label="$t('table.id')" prop="id" sortable="custom" align="center" width="75px">
-        <template slot-scope="scope">
-          <span>{{ index }}</span>
-        </template>
-      </el-table-column> -->
-      <el-table-column :label="$t('标题')" min-width="150px">
-        <template slot-scope="scope">
-          <span class="link-type" >{{ scope.title }}</span>
-          <el-tag>{{ scope.title }}</el-tag>
-        </template>
+      <el-table-column type="index" :index="indexMethod" label="序号" sortable="custom" align="center" width="75">
       </el-table-column>
-      <!-- <el-table-column :label="$t('类型')" width="110px" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
-        </template>
+      <el-table-column label="标题" prop="title" min-width="200">
+        <!-- <template slot-scope="scope">
+          <span>{{ scope.row.title }}</span>
+        </template> -->
       </el-table-column>
-      <el-table-column :label="$t('专题分类')" width="80px">
-        <template slot-scope="scope">
-          <svg-icon v-for="n in +scope.row.importance" :key="n" icon-class="star" class="meta-item__icon"/>
-        </template>
+      <el-table-column label="专题分类" prop="subClazz" width="150">
+        <!-- <template slot-scope="scope">
+          <span>{{ scope.row.subClazz }}</span>
+        </template> -->
       </el-table-column>
-      <el-table-column :label="$t('专题标签')" align="center" width="95">
-        <template slot-scope="scope">
-          <span v-if="scope.row.pageviews" class="link-type" @click="handleFetchPv(scope.row.pageviews)">{{ scope.row.pageviews }}</span>
-          <span v-else>0</span>
-        </template>
+      <el-table-column label="专题标签" prop="subTags" width="150">
+        <!-- <template slot-scope="scope">
+          <span>{{ scope.row.subTags }}</span>
+        </template> -->
       </el-table-column>
-      <el-table-column :label="$t('专题分类的准确率')" align="center" width="135">
-        <template slot-scope="scope">
-          <span v-if="scope.row.pageviews" class="link-type" @click="handleFetchPv(scope.row.pageviews)">{{ scope.row.pageviews }}</span>
-          <span v-else>0</span>
-        </template>
+      <el-table-column label="专题分类的准确率" prop="subClazzProba" align="center" width="135">
+        <!-- <template slot-scope="scope">
+          <span>{{ scope.row.subClazzProba }}</span>
+        </template> -->
       </el-table-column>
-      <el-table-column :label="$t('专题标签的准确率')" align="center" width="135">
-        <template slot-scope="scope">
-          <span v-if="scope.row.pageviews" class="link-type" @click="handleFetchPv(scope.row.pageviews)">{{ scope.row.pageviews }}</span>
-          <span v-else>0</span>
-        </template>
+      <el-table-column label="专题标签的准确率" prop="subTagsProba" align="center" width="135">
+        <!-- <template slot-scope="scope">
+          <span>{{ scope.row.subTagsProba }}</span>
+        </template> -->
       </el-table-column>
-      <el-table-column :label="$t('操作')" align="center" width="200px" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
           <el-button size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">{{ $t('table.delete') }}
           </el-button>
         </template>
-      </el-table-column> -->
+      </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+    <pagination :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
@@ -83,9 +79,9 @@
             <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key"/>
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('table.date')" prop="timestamp">
+        <!-- <el-form-item :label="$t('table.date')" prop="timestamp">
           <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date"/>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item :label="$t('table.title')" prop="title">
           <el-input v-model="temp.title"/>
         </el-form-item>
@@ -124,15 +120,15 @@
 import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // Waves directive
 import { parseTime } from '@/utils'
-import { request } from '@/utils/req.js'
+import { request,post } from '@/utils/req.js'
 import { obj2formdatastr } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 const calendarTypeOptions = [
-  { key: 'CN', display_name: '可用初始训练数据' },
-  { key: 'US', display_name: '人工校准' },
-  { key: 'JP', display_name: '识率很高数据' },
-  { key: 'EU', display_name: '临时标志中间处理数据' }
+  { key: '10', label: '可用初始训练数据' },
+  { key: '11', label: '人工校准' },
+  { key: '12', label: '识率很高数据' },
+  { key: '13', label: '临时标志中间处理数据' }
 ]
 
 const sortOptions = [
@@ -177,18 +173,18 @@ export default {
       total: 0,
       listLoading: true,
       listQuery: {
+        id: '',
         page: 1,
-        limit: 20,
+        limit: 10,
         importance: undefined,
         title: undefined,
         type: undefined,
+        state: '',
         sort: '+id'
       },
-      importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions,
       statusOptions: ['published', 'draft', 'deleted'],
-      showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
@@ -222,29 +218,41 @@ export default {
       this.listLoading = true
       let params = obj2formdatastr({
           month: '201812',
-          pageNumber: '1',
-          pageSize: '10',
-          state: '11',
+          pageNumber: this.listQuery.page,
+          pageSize: this.listQuery.limit,
+          state: this.listQuery.state,
           property: 'acceptTime',
           direction: 'DESC',
       })
       request('/sg/citymanagement/findByPage?' + params).then(data => {
-        console.log(20190318150721, data.content)
+        console.log(20190318150721, data)
         this.list = data.content
+        this.total = data.totalElements
 
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
         }, 0.5 * 1000)
-    })
-      // fetchList(this.listQuery).then(response => {
-      //   this.list = response.data.items
-      //   this.total = response.data.total
-      // })
+      })
+    },
+    indexMethod(index) {
+      return (index+1) + 10 * (this.listQuery.page-1);
+    },
+    changeTopics() {
+      // 路由跳转
+      this.$router.push({path: '/'+this.listQuery.type+'/index'})
     },
     handleFilter() {
-      this.listQuery.page = 1
-      this.getList()
+      request('/sg/citymanagement/' + this.listQuery.id).then(data => {
+        this.list = []
+        this.list.push(data)
+        this.listQuery.page = 1
+        this.total = 1
+        // Just to simulate the time of the request
+        setTimeout(() => {
+          this.listLoading = false
+        }, 0.5 * 1000)
+      })
     },
     handleModifyStatus(row, status) {
       this.$message({
@@ -253,20 +261,20 @@ export default {
       })
       row.status = status
     },
-    sortChange(data) {
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
-      } else {
-        this.listQuery.sort = '-id'
-      }
-      this.handleFilter()
-    },
+    // sortChange(data) {
+    //   const { prop, order } = data
+    //   if (prop === 'id') {
+    //     this.sortByID(order)
+    //   }
+    // },
+    // sortByID(order) {
+    //   if (order === 'ascending') {
+    //     this.listQuery.sort = '+id'
+    //   } else {
+    //     this.listQuery.sort = '-id'
+    //   }
+    //   this.handleFilter()
+    // },
     resetTemp() {
       this.temp = {
         id: undefined,
@@ -355,15 +363,16 @@ export default {
     },
     handleDownload() {
       this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
-        const filterVal = ['timestamp', 'title', 'type', 'importance', 'status']
-        const data = this.formatJson(filterVal, this.list)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'table-list'
-        })
+      let params = obj2formdatastr({
+          month: '201812',
+          pageNumber: this.listQuery.page,
+          pageSize: this.listQuery.limit,
+          state: this.listQuery.state,
+          property: 'acceptTime',
+          direction: 'DESC',
+      })
+      window.location.href="http://12345v1.dgdatav.com:6080/api/sg/citymanagement/export?" + params;
+      request('/sg/citymanagement/export?' + params).then(data => {
         this.downloadLoading = false
       })
     },
@@ -379,11 +388,4 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped>
-.filter-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-</style>
 
