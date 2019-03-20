@@ -1,29 +1,27 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-row :gutter="10">
-        <el-col :span="6">
-      ID查询：
-      <el-input placeholder="请输入订单编号" v-model="listQuery.id" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      
-        </el-col><el-col :span="5">
-      名称：
-      <el-select v-model="listQuery.state" placeholder="请选择名称" clearable class="filter-item" style="width: 130px" @change="getList">
-        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.label" :value="item.key"/>
-      </el-select>
-      </el-col>
-      <el-col :span="5">
-      当前专题：
-      <el-select v-model="listQuery.type" placeholder="请选择专题" clearable style="width: 140px" class="filter-item" @change="changeTopics">
-        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
-      </el-select>
-      </el-col>
-      <el-col :span="8">
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
-      <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button> -->
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">{{ $t('table.export') }}</el-button>
-      </el-col>
-      </el-row>
+      <div>
+        ID查询：
+        <el-input placeholder="请输入订单编号" v-model="listQuery.id" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      </div>
+      <div>
+        名称：
+        <el-select v-model="listQuery.state" placeholder="请选择名称" clearable class="filter-item" style="width: 130px" @change="getList">
+          <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.label" :value="item.key"/>
+        </el-select>
+      </div>
+      <div>
+        当前专题：
+        <el-select v-model="listQuery.type" placeholder="请选择专题" clearable style="width: 140px" class="filter-item" @change="changeTopics">
+          <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
+        </el-select>
+      </div>
+      <div>
+        <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
+        <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button> -->
+        <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
+      </div>
     </div>
 
     <el-table
@@ -63,8 +61,8 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">{{ $t('table.delete') }}
+          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
+          <el-button size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">删除
           </el-button>
         </template>
       </el-table-column>
@@ -261,12 +259,12 @@ export default {
       })
       row.status = status
     },
-    // sortChange(data) {
+    sortChange(data) {
     //   const { prop, order } = data
     //   if (prop === 'id') {
     //     this.sortByID(order)
     //   }
-    // },
+    },
     // sortByID(order) {
     //   if (order === 'ascending') {
     //     this.listQuery.sort = '+id'
@@ -388,4 +386,12 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.filter-container{
+  display: flex;
+  justify-content: space-between;
+}
+</style>
+
+
 

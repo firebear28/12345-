@@ -16,29 +16,29 @@ const getPureUrl = (url, start = 0) => {
 // const _tokenError = throttle(tokenError, 3000, { leading: true, trailing: false })
 
 // 添加请求拦截器，动态设置参数
-// axios.interceptors.request.use(config => {
+axios.interceptors.request.use(config => {
 
-//     // 中文转为decode编码
-//     config.url = encodeURI(config.url)
+    // 中文转为decode编码
+    config.url = encodeURI(config.url)
 
-//     // 设置公共URL http://12345v2.alltosea.com:6080/api
-//     config.baseURL = process.env.NODE_ENV === 'development' ? 'http://12345v1.dgdatav.com:6080/api' : '/api'
+    // 设置公共URL http://12345v2.alltosea.com:6080/api
+    config.baseURL = process.env.NODE_ENV === 'development' ? 'http://12345v1.dgdatav.com:6080/api' : '/api'
 
-//     // 获取纯Url（不包含?后面的参数）(也不包含baseURL的前缀)
-//     const pureUrl =  getPureUrl(config.url) 
+    // 获取纯Url（不包含?后面的参数）(也不包含baseURL的前缀)
+    const pureUrl =  getPureUrl(config.url) 
 
-//     // 如果需要去重复（默认noRepeat为 'on'，即开启去重复），则中止队列中所有相同请求地址的xhr
-//     config.noRepeat === 'on' && pending.forEach(_ => _.url === pureUrl && _.cancel('repeat abort' + pureUrl))
+    // 如果需要去重复（默认noRepeat为 'on'，即开启去重复），则中止队列中所有相同请求地址的xhr
+    config.noRepeat === 'on' && pending.forEach(_ => _.url === pureUrl && _.cancel('repeat abort' + pureUrl))
 
-//     // 配置 CancelToken
-//     config.cancelToken = new axios.CancelToken(cancel => {
-//        // 移除所有中止的请求，并且将新的请求推入缓存
-//        pending = [...pending.filter(_ => _.url != pureUrl), { url: pureUrl, cancel }]
-//     })
+    // 配置 CancelToken
+    config.cancelToken = new axios.CancelToken(cancel => {
+       // 移除所有中止的请求，并且将新的请求推入缓存
+       pending = [...pending.filter(_ => _.url != pureUrl), { url: pureUrl, cancel }]
+    })
 
-//     // 返回最终配置
-//     return config
-// })
+    // 返回最终配置
+    return config
+})
 
 // 响应拦截器
 axios.interceptors.response.use(res => {
@@ -58,6 +58,7 @@ const checkStatus = (response) => {
         // 返回Promise 
         return response.data
     } else {
+
       // 服务器响应异常
       throw new Error(response.statusText)
     }
