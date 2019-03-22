@@ -74,3 +74,13 @@ export const post = (url, options = {}) => {
     // 正式开始post请求
     return axios.post(url, options).then(checkStatus)
 }
+// put请求
+export const put = (url, options = {}) => {
+    // 正式开始post请求
+    return axios.put(url, options).then(checkStatus)
+}
+// delete请求
+export const reqDelete = (url, options = {}) => {
+    // 正式开始delete请求
+    return axios.delete(url, options).then(checkStatus)
+}

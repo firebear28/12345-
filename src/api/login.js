@@ -1,4 +1,19 @@
+// import {request} from '@/utils/req'
 import request from '@/utils/request'
+// import qs from 'qs'
+
+// export function loginByUsername(username, password) {
+//   const data = {
+//     userAccount: username,
+//     userPwd: password,
+//     type: 'account'
+//   }
+//   return request({
+//     url: '/admin/user/sysUser/login',
+//     method: 'post',
+//     data: qs.stringify(data)
+//   })
+// }
 
 export function loginByUsername(username, password) {
   const data = {

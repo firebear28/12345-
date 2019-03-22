@@ -1,5 +1,9 @@
 import { loginByUsername, logout, getUserInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import qs from 'qs'
+import { setCookie, getCookie, removeCookie } from '@/utils/cookie.js'
+import { request } from '@/utils/req.js'
+import { Message } from 'element-ui'
 
 const user = {
   state: {
@@ -58,6 +62,25 @@ const user = {
         })
       })
     },
+    // LoginByUsername({ state,commit }, userInfo) {
+    //   const username = userInfo.username.trim()
+    //     request('/admin/user/sysUser/login', {
+    //       method: 'POST',
+    //       headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'},
+    //       data: qs.stringify({ userAccount: username, userPwd: userInfo.password, type: 'account' })
+    //     }).then(data => {
+    //       if (data.code === 200) {
+    //         state.token = data.user.tokenId
+    //         setCookie('token', state.token, 7 * 24 * 60 * 60)
+    //         commit('SET_TOKEN', data.user.tokenId)
+    //         setToken(data.user.tokenId)
+    //       }else {
+    //         Message('登陆失败：' + data.message)
+    //       }
+    //     }).catch(error => {
+    //       console.log('error submit!!')
+    //     })
+    // },
 
     // 获取用户信息
     GetUserInfo({ commit, state }) {

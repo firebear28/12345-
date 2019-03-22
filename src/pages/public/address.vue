@@ -1,27 +1,19 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <div>
-        ID查询：
-        <el-input placeholder="请输入订单编号" v-model="listQuery.id" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      </div>
-      <div>
-        名称：
-        <el-select v-model="listQuery.state" placeholder="请选择名称" clearable class="filter-item" style="width: 130px" @change="getList">
-          <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.label" :value="item.key"/>
-        </el-select>
-      </div>
-      <div>
-        当前专题：
-        <el-select v-model="listQuery.type" placeholder="请选择专题" clearable style="width: 140px" class="filter-item" @change="changeTopics">
-          <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
-        </el-select>
-      </div>
-      <div>
-        <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
-        <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button> -->
-        <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
-      </div>
+      ID查询：
+      <el-input placeholder="请输入订单编号" v-model="listQuery.id" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      名称：
+      <el-select v-model="listQuery.state" placeholder="请选择名称" clearable class="filter-item" style="width: 130px" @change="getList">
+        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.label" :value="item.key"/>
+      </el-select>
+      当前专题：
+      <el-select v-model="listQuery.type" placeholder="请选择专题" clearable style="width: 140px" class="filter-item" @change="changeTopics">
+        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
+      </el-select>
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button>
+      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
     </div>
 
     <el-table
@@ -34,11 +26,11 @@
       @sort-change="sortChange">
       <el-table-column type="index" :index="indexMethod" label="序号" sortable="custom" align="center" width="75">
       </el-table-column>
-      <el-table-column label="镇街ID" prop="streetId" min-width="200">
+      <el-table-column label="主键" prop="bid" min-width="200">
       </el-table-column>
-      <el-table-column label="镇街名称" prop="streetName" width="150">
+      <el-table-column label="网站地址" prop="address" width="300">
       </el-table-column>
-      <el-table-column label="镇街所在地" prop="streetPid" width="150">
+      <el-table-column label="网站名称" prop="webName" width="300">
       </el-table-column>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -52,33 +44,20 @@
     <pagination :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item :label="$t('table.type')" prop="type">
-          <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key"/>
-          </el-select>
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px" style="width: 450px; margin-left:50px;">
+        <el-form-item label="主键" prop="bid">
+          <el-input v-model="temp.bid"/>
         </el-form-item>
-        <!-- <el-form-item :label="$t('table.date')" prop="timestamp">
-          <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date"/>
-        </el-form-item> -->
-        <el-form-item :label="$t('table.title')" prop="title">
-          <el-input v-model="temp.title"/>
+        <el-form-item label="网站地址" prop="address">
+          <el-input v-model="temp.address"/>
         </el-form-item>
-        <el-form-item :label="$t('table.status')">
-          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('table.importance')">
-          <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.remark')">
-          <el-input :autosize="{ minRows: 2, maxRows: 4}" v-model="temp.remark" type="textarea" placeholder="Please input"/>
+        <el-form-item label="网站名称" prop="webName">
+          <el-input v-model="temp.webName"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">{{ $t('table.confirm') }}</el-button>
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">提交</el-button>
       </div>
     </el-dialog>
 
@@ -99,7 +78,7 @@
 import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // Waves directive
 import { parseTime } from '@/utils'
-import { request,post } from '@/utils/req.js'
+import { request, post, put, reqDelete } from '@/utils/req.js'
 import { obj2formdatastr } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -165,26 +144,22 @@ export default {
       sortOptions,
       statusOptions: ['published', 'draft', 'deleted'],
       temp: {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
+        bid: '',
+        keyword: '',
         type: '',
-        status: 'published'
       },
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: '编辑',
+        create: '新增'
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        bid: [{ required: true, message: 'type is required', trigger: 'change' }],
+        address: [{ required: true, message: 'type is required', trigger: 'change' }],
+        webName: [{ required: true, message: 'type is required', trigger: 'change' }],
       },
       downloadLoading: false
     }
@@ -195,14 +170,13 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      request('/sg/base/sgStreet/findAllStreet').then(data => {
-        this.total = data.length
-        console.log(20190318150721,data)
-        if(this.listQuery.page == 1){
-          this.list = data.slice(0,10)
-        }else{
-          this.list = data.slice((this.listQuery.page-1)*10,this.listQuery.page*10)
-        }
+      let params = obj2formdatastr({
+          page: this.listQuery.page,
+          size: this.listQuery.limit,
+      })
+      request('/sg/item/sgSentimentAddress/findByPage?' + params).then(data => {
+        this.list = data.content
+        this.total = data.totalElements
 
         // Just to simulate the time of the request
         setTimeout(() => {
@@ -218,11 +192,17 @@ export default {
       this.$router.push({path: '/'+this.listQuery.type+'/index'})
     },
     handleFilter() {
-      request('/sg/citymanagement/' + this.listQuery.id).then(data => {
-        this.list = []
-        this.list.push(data)
-        this.listQuery.page = 1
-        this.total = 1
+      request('/sg/item/sgSentimentAddress/' + this.listQuery.id).then(data => {
+        if(data.length != 0){
+          this.list = []
+          this.list.push(data)
+          this.listQuery.page = 1
+          this.total = 1
+        }else{
+          this.list = []
+          this.listQuery.page = 0
+          this.total = 0
+        }
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
@@ -230,9 +210,15 @@ export default {
       })
     },
     handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作成功',
-        type: 'success'
+      reqDelete('/sg/item/sgSentimentAddress/' + row.bid).then(data => {
+        this.$notify({
+          title: '成功',
+          message: '删除成功',
+          type: 'success',
+          duration: 2000
+        })
+        const index = this.list.indexOf(row)
+        this.list.splice(index, 1)
       })
       row.status = status
     },
@@ -252,13 +238,9 @@ export default {
     // },
     resetTemp() {
       this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
+        bid: '',
+        address: '',
+        webName: '',
       }
     },
     handleCreate() {
@@ -270,11 +252,10 @@ export default {
       })
     },
     createData() {
+      const params = obj2formdatastr(this.temp)
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          createArticle(this.temp).then(() => {
+          post('/sg/item/sgSentimentAddress/add?' + params).then(data => {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.$notify({
@@ -289,7 +270,6 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -297,18 +277,10 @@ export default {
       })
     },
     updateData() {
+      const params = obj2formdatastr(this.temp)
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
-            for (const v of this.list) {
-              if (v.id === this.temp.id) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
-                break
-              }
-            }
+          put('/sg/item/sgSentimentAddress/update?' + params).then(data => {
             this.dialogFormVisible = false
             this.$notify({
               title: '成功',
@@ -316,19 +288,22 @@ export default {
               type: 'success',
               duration: 2000
             })
+            this.getList()
           })
         }
       })
     },
     handleDelete(row) {
-      this.$notify({
-        title: '成功',
-        message: '删除成功',
-        type: 'success',
-        duration: 2000
+      request('/sg/item/sgSentimentAddress/' + row.bid).then(data => {
+        this.$notify({
+          title: '成功',
+          message: '删除成功',
+          type: 'success',
+          duration: 2000
+        })
+        const index = this.list.indexOf(row)
+        this.list.splice(index, 1)
       })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
     },
     handleFetchPv(pv) {
       fetchPv(pv).then(response => {
@@ -342,8 +317,8 @@ export default {
           page: this.listQuery.page,
           size: this.listQuery.limit,
       })
-      window.location.href="http://12345v1.dgdatav.com:6080/api/sg/base/sgStreet/export?" + params;
-      request('/sg/base/sgStreet/export?' + params).then(data => {
+      window.location.href="http://12345v1.dgdatav.com:6080/api/sg/item/sgSentimentAddress/export?" + params;
+      request('/sg/item/sgSentimentAddress/export?' + params).then(data => {
         this.downloadLoading = false
       })
     },
@@ -360,9 +335,8 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.filter-container{
-  display: flex;
-  justify-content: space-between;
+.filter-item{
+  margin-right: 20px;
 }
 </style>
 

@@ -209,16 +209,34 @@ export const constantRouterMap = [
   {
     path: '/public',
     component: Layout,
-    redirect: '/public/index',
+    redirect: '/public/key',
+    alwaysShow: true, // will always show the root menu
+    meta: {
+      title: '舆情分析配置',
+      icon: 'guide',
+      roles: ['admin', 'editor'] // you can set roles in root nav
+    },
     children: [
       {
-        path: 'index',
-        component: () => import('@/pages/public/index'),
-        name: 'public',
-        meta: { title: '舆情分析配置', icon: 'guide', noCache: true }
+        path: 'key',
+        component: () => import('@/pages/public/key'),
+        name: 'PagePermission',
+        meta: {
+          title: '舆情关键字',
+          roles: ['admin'] // or you can only set roles in sub nav
+        }
+      },
+      {
+        path: 'address',
+        component: () => import('@/pages/public/address'),
+        name: 'DirectivePermission',
+        meta: {
+          title: '舆情地址表'
+          // if do not set roles, means: this page does not require permission
+        }
       }
     ]
-  }
+  },
 ]
 
 export default new Router({

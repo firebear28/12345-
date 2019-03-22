@@ -34,22 +34,22 @@
       @sort-change="sortChange">
       <el-table-column type="index" :index="indexMethod" label="序号" sortable="custom" align="center" width="75">
       </el-table-column>
-      <el-table-column label="名称" prop="title" width="120">
+      <el-table-column label="名称" prop="fullname" width="120">
         <!-- <template slot-scope="scope">
           <span>{{ scope.row.title }}</span>
         </template> -->
       </el-table-column>
-      <el-table-column label="登陆账号" prop="subClazz" width="250">
+      <el-table-column label="登陆账号" prop="account" width="250">
         <!-- <template slot-scope="scope">
           <span>{{ scope.row.subClazz }}</span>
         </template> -->
       </el-table-column>
-      <el-table-column label="邮件" prop="subTags" min-width="200">
+      <el-table-column label="邮件" prop="email" min-width="200">
         <!-- <template slot-scope="scope">
           <span>{{ scope.row.subTags }}</span>
         </template> -->
       </el-table-column>
-      <el-table-column label="手机号" prop="subClazzProba" align="center" width="230">
+      <el-table-column label="手机号" prop="mobile" align="center" width="230">
         <!-- <template slot-scope="scope">
           <span>{{ scope.row.subClazzProba }}</span>
         </template> -->
@@ -116,6 +116,7 @@ import { parseTime } from '@/utils'
 import { request,post } from '@/utils/req.js'
 import { obj2formdatastr } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+import qs from 'qs'
 
 const calendarTypeOptions = [
   { key: '10', label: '可用初始训练数据' },
@@ -179,13 +180,13 @@ export default {
       sortOptions,
       statusOptions: ['published', 'draft', 'deleted'],
       temp: {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
+        userid:'',
+        fullname: '',
+        accounttype: '',
+        account: '',
+        password: '',
+        email: '',
+        mobile: '',
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -209,23 +210,26 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      let params = obj2formdatastr({
-          userAgent: '201812',
-          tokenid: 'this.listQuery.page',
-          // pageSize: this.listQuery.limit,
-          // state: this.listQuery.state,
-          // property: 'acceptTime',
-          // direction: 'DESC',
-      })
-      request('/admin/user/sysUser/search?' + params).then(data => {
-        this.list = data
-        // this.total = data.totalElements
+      const acc = {
+          userAccount: "dgdp",
+          userPwd: "ch#ks!690",
+          type: "account"
+      }
+	  request('/admin/user/sysUser/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'},
+      data: qs.stringify(acc)
+    }).then(data => {
+        request('/admin/user/sysUser/search?tokenid=' + data.user.tokenId).then(data => {
+          this.list = data.rows
+          // this.total = data.totalElements
 
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 0.5 * 1000)
-      })
+          // Just to simulate the time of the request
+          setTimeout(() => {
+            this.listLoading = false
+          }, 0.5 * 1000)
+        })
+    })
     },
     indexMethod(index) {
       return (index+1) + 10 * (this.listQuery.page-1);

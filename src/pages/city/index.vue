@@ -6,8 +6,8 @@
         <el-input placeholder="请输入订单编号" v-model="listQuery.id" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       </div>
       <div>
-        名称：
-        <el-select v-model="listQuery.state" placeholder="请选择名称" clearable class="filter-item" style="width: 130px" @change="getList">
+        状态：
+        <el-select v-model="listQuery.state" placeholder="请选择状态" clearable class="filter-item" style="width: 130px" @change="getList">
           <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.label" :value="item.key"/>
         </el-select>
       </div>
