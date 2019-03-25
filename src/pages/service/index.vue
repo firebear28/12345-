@@ -26,30 +26,27 @@
       @sort-change="sortChange">
       <el-table-column type="index" :index="indexMethod" label="序号" sortable="custom" align="center" width="75">
       </el-table-column>
-      <el-table-column label="标题" prop="title" min-width="200">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.title }}</span>
-        </template> -->
+      <el-table-column label="登陆账号" prop="account" min-width="200">
       </el-table-column>
-      <el-table-column label="专题分类" prop="subClazz" width="150">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subClazz }}</span>
-        </template> -->
+      <el-table-column label="登陆渠道" prop="fromChannel" width="150">
       </el-table-column>
-      <el-table-column label="专题标签" prop="subTags" width="150">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subTags }}</span>
-        </template> -->
+      <el-table-column label="来源推广渠道" prop="advertChannel" width="150">
       </el-table-column>
-      <el-table-column label="专题分类的准确率" prop="subClazzProba" align="center" width="135">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subClazzProba }}</span>
-        </template> -->
+      <el-table-column label="调用标识" prop="requestIden" width="150">
       </el-table-column>
-      <el-table-column label="专题标签的准确率" prop="subTagsProba" align="center" width="135">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subTagsProba }}</span>
-        </template> -->
+      <el-table-column label="请求时间" prop="requestTime" width="150">
+      </el-table-column>
+      <el-table-column label="响应时间" prop="responseTime" width="150">
+      </el-table-column>
+      <el-table-column label="响应编码" prop="responseCode" width="150">
+      </el-table-column>
+      <el-table-column label="响应消息" prop="responseMessage" width="150">
+      </el-table-column>
+      <el-table-column label="调用方IP" prop="clientIp" width="150">
+      </el-table-column>
+      <el-table-column label="服务器IP" prop="requestParams" width="150">
+      </el-table-column>
+      <el-table-column label="调用参数" prop="responseData" width="150">
       </el-table-column>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -207,15 +204,11 @@ export default {
     getList() {
       this.listLoading = true
       let params = obj2formdatastr({
-          month: '201812',
-          pageNumber: this.listQuery.page,
-          pageSize: this.listQuery.limit,
-          state: this.listQuery.state,
-          property: 'acceptTime',
-          direction: 'DESC',
+          account: 'dgdp',
+          page: this.listQuery.page,
+          size: this.listQuery.limit,
       })
-      request('/sg/citymanagement/findByPage?' + params).then(data => {
-        console.log(20190318150721, data)
+      request('/sg/base/logApiRequest/findByAccount?' + params).then(data => {
         this.list = data.content
         this.total = data.totalElements
 
@@ -354,15 +347,12 @@ export default {
     handleDownload() {
       this.downloadLoading = true
       let params = obj2formdatastr({
-          month: '201812',
-          pageNumber: this.listQuery.page,
-          pageSize: this.listQuery.limit,
-          state: this.listQuery.state,
-          property: 'acceptTime',
-          direction: 'DESC',
+          account: 'dgdp',
+          page: this.listQuery.page,
+          size: this.listQuery.limit,
       })
-      window.location.href="http://12345v1.dgdatav.com:6080/api/sg/citymanagement/export?" + params;
-      request('/sg/citymanagement/export?' + params).then(data => {
+      window.location.href="http://12345v1.dgdatav.com:6080/api/sg/base/logApiRequest/export?" + params;
+      request('/sg/base/logApiRequest/export?' + params).then(data => {
         this.downloadLoading = false
       })
     },
