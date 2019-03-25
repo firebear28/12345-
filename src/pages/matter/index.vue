@@ -34,25 +34,21 @@
       @sort-change="sortChange">
       <el-table-column type="index" :index="indexMethod" label="序号" sortable="custom" align="center" width="75">
       </el-table-column>
-      <el-table-column label="部门ID" prop="departId" width="100">
+      <el-table-column label="事项id" prop="itemId" width="100">
       </el-table-column>
-      <el-table-column label="部门名称" prop="departName" min-width="150">
+      <el-table-column label="事项名称" prop="itemName" min-width="150">
       </el-table-column>
-      <el-table-column label="备注" prop="remark" width="150">
+      <el-table-column label="上级事项id" prop="pid" width="150">
       </el-table-column>
-      <el-table-column label="上级部门ID" prop="rootDepartId" align="center" width="135">
+      <el-table-column label="事项类型" prop="itemType" align="center" width="135">
       </el-table-column>
-      <el-table-column label="上级部门名称" prop="rootDepartName" align="center" width="135">
+      <el-table-column label="事项部门" prop="itemDepart" align="center" width="135">
       </el-table-column>
-      <el-table-column label="子系统部门ID" prop="subDepartId" align="center" width="135">
+      <el-table-column label="源事项id" prop="subItemId" align="center" width="135">
       </el-table-column>
-      <el-table-column label="子系统部门名称" prop="subDepartName" align="center" width="135">
+      <el-table-column label="源事项名称" prop="subItemName" align="center" width="135">
       </el-table-column>
-      <el-table-column label="子系统ID（HL|ZW）" prop="subId" align="center" width="150">
-      </el-table-column>
-      <el-table-column label="子系统上级部门ID" prop="subRootDepartId" align="center" width="135">
-      </el-table-column>
-      <el-table-column label="子系统上级部门名称" prop="subRootDepartName" align="center" width="150">
+      <el-table-column label="事项来源" prop="subIden" align="center" width="150">
       </el-table-column>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -252,8 +248,8 @@ export default {
       })
       request('/sg/twoconitem/findByPage?' + params).then(data => {
         console.log(20190318150721, data)
-        this.list = data.rows
-        this.total = data.total
+        this.list = data.content
+        this.total = data.totalElements
 
         // Just to simulate the time of the request
         setTimeout(() => {
