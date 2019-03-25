@@ -149,7 +149,7 @@ export const constantRouterMap = [
       }
     ]
   },
-  // 账号管理
+  // 用户管理
   {
     path: '/account',
     component: Layout,
@@ -159,7 +159,7 @@ export const constantRouterMap = [
         path: 'index',
         component: () => import('@/pages/account/index'),
         name: 'account',
-        meta: { title: '账号管理', icon: 'guide', noCache: true }
+        meta: { title: '用户管理', icon: 'guide', noCache: true }
       }
     ]
   },

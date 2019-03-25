@@ -19,7 +19,7 @@
       </div>
       <div>
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
-        <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button> -->
+        <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button>
         <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
       </div>
     </div>
@@ -35,24 +35,12 @@
       <el-table-column type="index" :index="indexMethod" label="序号" sortable="custom" align="center" width="75">
       </el-table-column>
       <el-table-column label="名称" prop="fullname" width="120">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.title }}</span>
-        </template> -->
       </el-table-column>
       <el-table-column label="登陆账号" prop="account" width="250">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subClazz }}</span>
-        </template> -->
       </el-table-column>
       <el-table-column label="邮件" prop="email" min-width="200">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subTags }}</span>
-        </template> -->
       </el-table-column>
       <el-table-column label="手机号" prop="mobile" align="center" width="230">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subClazzProba }}</span>
-        </template> -->
       </el-table-column>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -67,32 +55,28 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item :label="$t('table.type')" prop="type">
-          <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key"/>
-          </el-select>
+        <el-form-item label="名称" prop="fullname">
+          <el-input v-model="temp.fullname"/>
         </el-form-item>
-        <!-- <el-form-item :label="$t('table.date')" prop="timestamp">
-          <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date"/>
-        </el-form-item> -->
-        <el-form-item :label="$t('table.title')" prop="title">
-          <el-input v-model="temp.title"/>
+        <el-form-item label="账号类型" prop="accounttype">
+          <el-input v-model="temp.accounttype"/>
         </el-form-item>
-        <el-form-item :label="$t('table.status')">
-          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item"/>
-          </el-select>
+        <el-form-item label="登录账号" prop="account">
+          <el-input v-model="temp.account"/>
         </el-form-item>
-        <el-form-item :label="$t('table.importance')">
-          <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;"/>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="temp.password"/>
         </el-form-item>
-        <el-form-item :label="$t('table.remark')">
-          <el-input :autosize="{ minRows: 2, maxRows: 4}" v-model="temp.remark" type="textarea" placeholder="Please input"/>
+        <el-form-item label="邮件" prop="email">
+          <el-input v-model="temp.email"/>
+        </el-form-item>
+        <el-form-item label="手机号" prop="mobile">
+          <el-input v-model="temp.mobile"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">{{ $t('table.confirm') }}</el-button>
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">提交</el-button>
       </div>
     </el-dialog>
 
@@ -116,7 +100,6 @@ import { parseTime } from '@/utils'
 import { request,post } from '@/utils/req.js'
 import { obj2formdatastr } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
-import qs from 'qs'
 
 const calendarTypeOptions = [
   { key: '10', label: '可用初始训练数据' },
@@ -162,6 +145,7 @@ export default {
   },
   data() {
     return {
+      token: '',
       tableKey: 0,
       list: null,
       total: 0,
@@ -180,6 +164,7 @@ export default {
       sortOptions,
       statusOptions: ['published', 'draft', 'deleted'],
       temp: {
+        isNew: true,
         userid:'',
         fullname: '',
         accounttype: '',
@@ -191,15 +176,15 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: '编辑',
+        create: '新增'
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        // type: [{ required: true, message: 'type is required', trigger: 'change' }],
+        // timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
+        // title: [{ required: true, message: 'title is required', trigger: 'blur' }]
       },
       downloadLoading: false
     }
@@ -210,26 +195,15 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      const acc = {
-          userAccount: "dgdp",
-          userPwd: "ch#ks!690",
-          type: "account"
-      }
-	  request('/admin/user/sysUser/login', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'},
-      data: qs.stringify(acc)
-    }).then(data => {
-        request('/admin/user/sysUser/search?tokenid=' + data.user.tokenId).then(data => {
+        request('/admin/user/sysUser/search?size='+this.listQuery.limit+'&page='+(this.listQuery.page-1)).then(data => {
           this.list = data.rows
-          // this.total = data.totalElements
+          this.total = data.total
 
           // Just to simulate the time of the request
           setTimeout(() => {
             this.listLoading = false
           }, 0.5 * 1000)
         })
-    })
     },
     indexMethod(index) {
       return (index+1) + 10 * (this.listQuery.page-1);
@@ -239,7 +213,7 @@ export default {
       this.$router.push({path: '/'+this.listQuery.type+'/index'})
     },
     handleFilter() {
-      request('/admin/user/sysUser/' + this.listQuery.id).then(data => {
+      request('/admin/user/sysUser/' + this.listQuery.id ).then(data => {
         this.list = []
         this.list.push(data)
         this.listQuery.page = 1
@@ -252,14 +226,19 @@ export default {
     },
     // 删除
     handleModifyStatus(row, status) {
-      post('/admin/user/sysUser/delete?' + row.id).then(data => {
+      post('/admin/user/sysUser/delete?id=' + row.userid ).then(data => {
         this.$message({
-          message: '操作成功',
+          message: '删除成功',
           type: 'success'
         })
+        this.getList()
+        row.status = status
+      }).catch(()=>{
+          this.$message({
+            message: '删除失败',
+            type: 'error'
+          })
       })
-      row.status = status
-      this.getList()
     },
     sortChange(data) {
     //   const { prop, order } = data
@@ -277,13 +256,14 @@ export default {
     // },
     resetTemp() {
       this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
+        isNew: true,
+        userid:'',
+        fullname: '',
+        accounttype: '',
+        account: '',
+        password: '',
+        email: '',
+        mobile: '',
       }
     },
     handleCreate() {
@@ -295,11 +275,10 @@ export default {
       })
     },
     createData() {
+      const params = obj2formdatastr(this.temp)
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          createArticle(this.temp).then(() => {
+          post('/admin/user/sysUser?' + params).then(data => {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.$notify({
@@ -322,18 +301,11 @@ export default {
       })
     },
     updateData() {
+      this.temp.isNew = false
+      const params = obj2formdatastr(this.temp)
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
-            for (const v of this.list) {
-              if (v.id === this.temp.id) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
-                break
-              }
-            }
+          post('/admin/user/sysUser?' + params).then(data => {
             this.dialogFormVisible = false
             this.$notify({
               title: '成功',
@@ -341,6 +313,7 @@ export default {
               type: 'success',
               duration: 2000
             })
+            this.getList()
           })
         }
       })
