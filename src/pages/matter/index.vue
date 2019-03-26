@@ -63,57 +63,29 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="140px" style="width: 500px; margin-left:50px;">
-        <!-- <el-form-item :label="$t('table.type')" prop="type">
-          <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key"/>
-          </el-select>
-        </el-form-item> -->
-        <!-- <el-form-item :label="$t('table.date')" prop="timestamp">
-          <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date"/>
-        </el-form-item> -->
-        <el-form-item label="部门ID" prop="departId">
-          <el-input v-model="temp.departId"/>
+        <el-form-item label="事项id" prop="itemId">
+          <el-input v-model="temp.itemId"/>
         </el-form-item>
-        <el-form-item label="部门名称" prop="departName">
-          <el-input v-model="temp.departName"/>
+        <el-form-item label="事项名称" prop="itemName">
+          <el-input v-model="temp.itemName"/>
         </el-form-item>
-        <el-form-item label="上级部门ID" prop="rootDepartId">
-          <el-input v-model="temp.rootDepartId"/>
+        <el-form-item label="上级事项id" prop="pid">
+          <el-input v-model="temp.pid"/>
         </el-form-item>
-        <el-form-item label="上级部门名称" prop="rootDepartName">
-          <el-input v-model="temp.rootDepartName"/>
+        <el-form-item label="事项类型" prop="itemType">
+          <el-input v-model="temp.itemType"/>
         </el-form-item>
-        <el-form-item label="子系统部门ID" prop="subDepartId">
-          <el-input v-model="temp.subDepartId"/>
+        <el-form-item label="事项部门" prop="itemDepart">
+          <el-input v-model="temp.itemDepart"/>
         </el-form-item>
-        <el-form-item label="子系统部门等级" prop="subDepartLevel">
-          <el-input v-model="temp.subDepartLevel"/>
+        <el-form-item label="源事项id" prop="subItemId">
+          <el-input v-model="temp.subItemId"/>
         </el-form-item>
-        <el-form-item label="子系统部门名称" prop="subDepartName">
-          <el-input v-model="temp.subDepartName"/>
+        <el-form-item label="源事项名称" prop="subItemName">
+          <el-input v-model="temp.subItemName"/>
         </el-form-item>
-        <el-form-item label="子系统ID（HL|ZW）" prop="subId">
-          <el-input v-model="temp.subId"/>
-        </el-form-item>
-        <el-form-item label="子系统上级部门ID" prop="subRootDepartId">
-          <el-input v-model="temp.subRootDepartId"/>
-        </el-form-item>
-        <el-form-item label="子系统上级部门名称" prop="subRootDepartName">
-          <el-input v-model="temp.subRootDepartName"/>
-        </el-form-item>
-        <el-form-item label="子系统部门父类型" prop="subRootDepartType">
-          <el-input v-model="temp.subRootDepartType"/>
-        </el-form-item>
-        <!-- <el-form-item :label="$t('table.status')">
-          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('table.importance')">
-          <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;"/>
-        </el-form-item> -->
-        <el-form-item label="备注">
-          <el-input :autosize="{ minRows: 2, maxRows: 4}" v-model="temp.remark" type="textarea" placeholder="Please input"/>
+        <el-form-item label="事项来源" prop="subIden">
+          <el-input v-model="temp.subIden"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -139,7 +111,7 @@
 import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // Waves directive
 import { parseTime } from '@/utils'
-import { request,post } from '@/utils/req.js'
+import { request, post, reqDelete, put } from '@/utils/req.js'
 import { obj2formdatastr } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -205,20 +177,15 @@ export default {
       sortOptions,
       statusOptions: ['published', 'draft', 'deleted'],
       temp: {
-        departId: '',
-        departName: '',
-        id: '',
-        isNew: '',
-        remark: '',
-        rootDepartId: '',
-        subDepartId: '',
-        subDepartLevel: '',
-        subDepartName: '',
-        subId: '',
-        subRootDepartId: '',
-        subRootDepartName: '',
-        subRootDepartType: '',
-        status: 'published'
+        mid: '',
+        itemId: '',
+        itemName: '',
+        pid: '',
+        itemType: '',
+        itemDepart: '',
+        subItemId: '',
+        subItemName: '',
+        subIden: '',
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -247,7 +214,6 @@ export default {
           size: this.listQuery.limit,
       })
       request('/sg/twoconitem/findByPage?' + params).then(data => {
-        console.log(20190318150721, data)
         this.list = data.content
         this.total = data.totalElements
 
@@ -265,7 +231,7 @@ export default {
       this.$router.push({path: '/'+this.listQuery.type+'/index'})
     },
     handleFilter() {
-      request('/sg/department/sgMainDepartment/' + this.listQuery.id).then(data => {
+      request('/sg/twoconitem/' + this.listQuery.id).then(data => {
         this.list = []
         this.list.push(data)
         this.listQuery.page = 1
@@ -277,11 +243,16 @@ export default {
       })
     },
     handleModifyStatus(row, status) {
-      post('/sg/department/sgMainDepartment/delete?' + row.departId).then(data => {
-        this.$message({
-          message: '操作成功',
-          type: 'success'
+      reqDelete('/sg/twoconitem/' + row.mid).then(data => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: '成功',
+          message: '删除成功',
+          type: 'success',
+          duration: 2000
         })
+        const index = this.list.indexOf(row)
+        this.list.splice(index, 1)
       })
       row.status = status
     },
@@ -301,19 +272,15 @@ export default {
     // },
     resetTemp() {
       this.temp = {
-        departId: '',
-        departName: '',
-        id: '',
-        isNew: true,
-        remark: '',
-        rootDepartId: '',
-        subDepartId: '',
-        subDepartLevel: '',
-        subDepartName: '',
-        subId: '',
-        subRootDepartId: '',
-        subRootDepartName: '',
-        subRootDepartType: '',
+        mid: '',
+        itemId: '',
+        itemName: '',
+        pid: '',
+        itemType: '',
+        itemDepart: '',
+        subItemId: '',
+        subItemName: '',
+        subIden: '',
       }
     },
     handleCreate() {
@@ -328,7 +295,7 @@ export default {
       const params = obj2formdatastr(this.temp)
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          post('/sg/department/sgMainDepartment?' + params).then(data => {
+          post('/sg/twoconitem/add?' + params).then(data => {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.$notify({
@@ -342,7 +309,7 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.temp.isNew = false
+      this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -353,7 +320,7 @@ export default {
       const params = obj2formdatastr(this.temp)
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          post('/sg/department/sgMainDepartment?' + params).then(data => {
+          put('/sg/twoconitem/update?' + params).then(data => {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.$notify({
@@ -367,14 +334,18 @@ export default {
       })
     },
     handleDelete(row) {
-      this.$notify({
-        title: '成功',
-        message: '删除成功',
-        type: 'success',
-        duration: 2000
+      reqDelete('/sg/twoconitem/' + row.mid).then(data => {
+        this.list.unshift(this.temp)
+        this.dialogFormVisible = false
+        this.$notify({
+          title: '成功',
+          message: '删除成功',
+          type: 'success',
+          duration: 2000
+        })
+        const index = this.list.indexOf(row)
+        this.list.splice(index, 1)
       })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
     },
     handleFetchPv(pv) {
       fetchPv(pv).then(response => {
@@ -386,15 +357,11 @@ export default {
     handleDownload() {
       this.downloadLoading = true
       let params = obj2formdatastr({
-          month: '201812',
-          pageNumber: this.listQuery.page,
-          pageSize: this.listQuery.limit,
-          state: this.listQuery.state,
-          property: 'acceptTime',
-          direction: 'DESC',
+          page: this.listQuery.page,
+          size: this.listQuery.limit,
       })
-      request('/sg/citymanagement/export?' + params).then(data => {
-        window.location.href="http://12345v1.dgdatav.com:6080/api/sg/citymanagement/export?" + params;
+      request('/sg/twoconitem/export?' + params).then(data => {
+        window.location.href="http://12345v1.dgdatav.com:6080/api/sg/twoconitem/export?" + params;
         this.downloadLoading = false
       })
     },
