@@ -29,7 +29,7 @@ axios.interceptors.request.use(config => {
     config.url = encodeURI(config.url)
 
     // 设置公共URL http://12345v2.alltosea.com:6080/api
-    config.baseURL = process.env.NODE_ENV === 'development' ? 'http://12345v1.dgdatav.com:6080/api' : '/api'
+    config.baseURL = 'http://12345v1.dgdatav.com:6080/api' // process.env.NODE_ENV === 'development' ? 'http://12345v1.dgdatav.com:6080/api' : '/api'
 
     // 设置公共GET参数(由于本项目的后端接口只有GET请求,所以只需要处理GET请求即可，如果需要POST则设置data参数)
     config.params = { tokenid: getToken(), userAgent: getUserAgent() }
