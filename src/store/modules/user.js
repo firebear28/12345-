@@ -1,5 +1,5 @@
 import { logout, getUserInfo } from '@/api/login'
-import { getToken, setToken, removeToken, setUserAgent } from '@/utils/auth'
+import { getToken, setToken, removeToken, getUserAgent, setUserAgent, removeUserAgent } from '@/utils/auth'
 import qs from 'qs'
 import { request } from '@/utils/req.js'
 import { Message } from 'element-ui'
@@ -10,7 +10,7 @@ const user = {
     status: '',
     code: '',
     token: getToken(),
-    userAgent: '',
+    userAgent: getUserAgent(),
     name: '',
     avatar: '',
     introduction: '',
@@ -103,6 +103,7 @@ const user = {
           commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
           removeToken()
+          removeUserAgent()
           resolve()
         }).catch(error => {
           reject(error)
