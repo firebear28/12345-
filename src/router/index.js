@@ -214,7 +214,7 @@ export const constantRouterMap = [
     meta: {
       title: '舆情分析配置',
       icon: 'guide',
-      roles: ['admin', 'editor'] // you can set roles in root nav
+      // roles: ['admin', 'editor'] // you can set roles in root nav
     },
     children: [
       {
@@ -223,7 +223,7 @@ export const constantRouterMap = [
         name: 'PagePermission',
         meta: {
           title: '舆情关键字',
-          roles: ['admin'] // or you can only set roles in sub nav
+          // roles: ['admin'] // or you can only set roles in sub nav
         }
       },
       {

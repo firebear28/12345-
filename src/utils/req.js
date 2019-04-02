@@ -1,5 +1,6 @@
 import axios from 'axios'
-import qs from 'qs'
+// import store from '../store'
+import { getToken, getUserAgent } from '@/utils/auth' // getToken from cookie
 
 // 请求队列
 let pending = []
@@ -16,27 +17,12 @@ const getPureUrl = (url, start = 0) => {
 // trailing 为 fasle时，不会触发最后一次。这样比较符合直觉。
 // const _tokenError = throttle(tokenError, 3000, { leading: true, trailing: false })
 
-const acc = {
-    userAccount: "dgdp",
-    userPwd: "ch#ks!690",
-    type: "account"
-}
-var tokenid;
-
-// axios('http://12345v1.dgdatav.com:6080/api/admin/user/sysUser/login', {
-//     method: 'POST',
-//     headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'},
-//     data: qs.stringify(acc)
-// }).then(data => {
-//     tokenid = data.data.user.tokenId
-//     console.log(20190325145141, data.data.user.tokenId,data.data.user.userAgent)
-// })
 
 // 添加请求拦截器，动态设置参数
 axios.interceptors.request.use(config => {
 
     // 合并请求头 authority-token
-    // config.headers = Object.assign({}, config.headers, { 'tokenid': 'oSHcqaiFtb0jZV0otnnmC5O26CKJ_34hc2p_9xYWM1I' })
+    // config.headers = Object.assign({}, config.headers, { 'tokenid': 'getToken()' })
     // config.headers = Object.assign({}, config.headers, { 'userAgent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36' })
 
     // 中文转为decode编码
@@ -46,7 +32,7 @@ axios.interceptors.request.use(config => {
     config.baseURL = process.env.NODE_ENV === 'development' ? 'http://12345v1.dgdatav.com:6080/api' : '/api'
 
     // 设置公共GET参数(由于本项目的后端接口只有GET请求,所以只需要处理GET请求即可，如果需要POST则设置data参数)
-    config.params = { tokenid: 'oSHcqaiFtb0jZV0otnnmC5O26CKJ_34hc2p_9xYWM1I', userAgent: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36' }
+    config.params = { tokenid: getToken(), userAgent: getUserAgent() }
 
     // 获取纯Url（不包含?后面的参数）(也不包含baseURL的前缀)
     const pureUrl =  getPureUrl(config.url) 

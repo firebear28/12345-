@@ -1,7 +1,6 @@
-import { loginByUsername, logout, getUserInfo } from '@/api/login'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { logout, getUserInfo } from '@/api/login'
+import { getToken, setToken, removeToken, setUserAgent } from '@/utils/auth'
 import qs from 'qs'
-import { setCookie, getCookie, removeCookie } from '@/utils/cookie.js'
 import { request } from '@/utils/req.js'
 import { Message } from 'element-ui'
 
@@ -11,6 +10,7 @@ const user = {
     status: '',
     code: '',
     token: getToken(),
+    userAgent: '',
     name: '',
     avatar: '',
     introduction: '',
@@ -26,6 +26,9 @@ const user = {
     },
     SET_TOKEN: (state, token) => {
       state.token = token
+    },
+    SET_USERAGENT: (state, userAgent) => {
+      state.userAgent = userAgent
     },
     SET_INTRODUCTION: (state, introduction) => {
       state.introduction = introduction
@@ -49,63 +52,34 @@ const user = {
 
   actions: {
     // 用户名登录
-    LoginByUsername({ commit }, userInfo) {
+    LoginByUsername({ state,commit, dispatch }, userInfo) {
       const username = userInfo.username.trim()
-      return new Promise((resolve, reject) => {
-        loginByUsername(username, userInfo.password).then(response => {
-          const data = response.data
-          commit('SET_TOKEN', data.token)
-          setToken(response.data.token)
-          resolve()
-        }).catch(error => {
-          reject(error)
-        })
+      return request('/admin/user/sysUser/login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'},
+          data: qs.stringify({ userAccount: username, userPwd: userInfo.password, type: 'account' })
+      }).then(data => {
+        if (data.code === 200) {
+          state.token = data.user.tokenId
+          commit('SET_TOKEN', data.user.tokenId)
+          commit('SET_USERAGENT', data.user.userAgent)
+          dispatch('GetUserInfo')
+          setToken(data.user.tokenId)
+          setUserAgent(data.user.userAgent)
+        }else {
+          Message('登陆失败：' + data.message)
+        }
+      }).catch(error => {
+        console.log('error submit!!')
       })
     },
-    // LoginByUsername({ state,commit }, userInfo) {
-    //   const username = userInfo.username.trim()
-    //     request('/admin/user/sysUser/login', {
-    //       method: 'POST',
-    //       headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'},
-    //       data: qs.stringify({ userAccount: username, userPwd: userInfo.password, type: 'account' })
-    //     }).then(data => {
-    //       if (data.code === 200) {
-    //         state.token = data.user.tokenId
-    //         setCookie('token', state.token, 7 * 24 * 60 * 60)
-    //         commit('SET_TOKEN', data.user.tokenId)
-    //         setToken(data.user.tokenId)
-    //       }else {
-    //         Message('登陆失败：' + data.message)
-    //       }
-    //     }).catch(error => {
-    //       console.log('error submit!!')
-    //     })
-    // },
 
     // 获取用户信息
     GetUserInfo({ commit, state }) {
-      return new Promise((resolve, reject) => {
-        getUserInfo(state.token).then(response => {
-          // 由于mockjs 不支持自定义状态码只能这样hack
-          if (!response.data) {
-            reject('Verification failed, please login again.')
-          }
-          const data = response.data
-
-          if (data.roles && data.roles.length > 0) { // 验证返回的roles是否是一个非空数组
-            commit('SET_ROLES', data.roles)
-          } else {
-            reject('getInfo: roles must be a non-null array!')
-          }
-
-          commit('SET_NAME', data.name)
-          commit('SET_AVATAR', data.avatar)
-          commit('SET_INTRODUCTION', data.introduction)
-          resolve(response)
-        }).catch(error => {
-          reject(error)
-        })
-      })
+      commit('SET_ROLES', ['admin'])
+      commit('SET_NAME', 'Super Admin')
+      commit('SET_AVATAR', 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif')
+      commit('SET_INTRODUCTION', '我是超级管理员')
     },
 
     // 第三方验证登录
