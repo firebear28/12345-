@@ -223,7 +223,6 @@ export default {
           direction: 'DESC',
       })
       request('/sg/citymanagement/findByPage?' + params).then(data => {
-        console.log(20190318150721, data)
         this.list = data.content
         this.total = data.totalElements
 

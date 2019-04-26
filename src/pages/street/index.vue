@@ -197,7 +197,6 @@ export default {
       this.listLoading = true
       request('/sg/base/sgStreet/findAllStreet').then(data => {
         this.total = data.length
-        console.log(20190318150721,data)
         if(this.listQuery.page == 1){
           this.list = data.slice(0,10)
         }else{

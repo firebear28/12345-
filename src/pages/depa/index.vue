@@ -251,7 +251,6 @@ export default {
           size: this.listQuery.limit,
       })
       request('/sg/department/sgMainDepartment/search?' + params).then(data => {
-        console.log(20190318150721, data)
         this.list = data.rows
         this.total = data.total
 

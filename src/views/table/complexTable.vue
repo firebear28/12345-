@@ -239,7 +239,6 @@ export default {
     getList() {
       this.listLoading = true
       request('/sg/department/sgMainDepartment/search?page=0&size=10').then(data => {
-        console.log(20190318150721, data)
 
         // Just to simulate the time of the request
         setTimeout(() => {
