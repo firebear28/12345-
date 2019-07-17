@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="filter-container">
       ID查询：
-      <el-input placeholder="请输入订单编号" v-model="listQuery.id" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       名称：
       <el-select v-model="listQuery.state" placeholder="请选择名称" clearable class="filter-item" style="width: 130px" @change="getList">
         <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.label" :value="item.key"/>
@@ -24,30 +24,18 @@
       highlight-current-row
       style="width: 100%;"
       @sort-change="sortChange">
-      <el-table-column type="index" :index="indexMethod" label="序号" sortable="custom" align="center" width="75">
-      </el-table-column>
-      <el-table-column label="登陆账号" prop="account" min-width="200">
-      </el-table-column>
-      <el-table-column label="登陆渠道" prop="fromChannel" width="150">
-      </el-table-column>
-      <el-table-column label="来源推广渠道" prop="advertChannel" width="150">
-      </el-table-column>
-      <el-table-column label="调用标识" prop="requestIden" width="150">
-      </el-table-column>
-      <el-table-column label="请求时间" prop="requestTime" width="150">
-      </el-table-column>
-      <el-table-column label="响应时间" prop="responseTime" width="150">
-      </el-table-column>
-      <el-table-column label="响应编码" prop="responseCode" width="150">
-      </el-table-column>
-      <el-table-column label="响应消息" prop="responseMessage" width="150">
-      </el-table-column>
-      <el-table-column label="调用方IP" prop="clientIp" width="150">
-      </el-table-column>
-      <el-table-column label="服务器IP" prop="requestParams" width="150">
-      </el-table-column>
-      <el-table-column label="调用参数" prop="responseData" width="150">
-      </el-table-column>
+      <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
+      <el-table-column label="登陆账号" prop="account" min-width="200"/>
+      <el-table-column label="登陆渠道" prop="fromChannel" width="150"/>
+      <el-table-column label="来源推广渠道" prop="advertChannel" width="150"/>
+      <el-table-column label="调用标识" prop="requestIden" width="150"/>
+      <el-table-column label="请求时间" prop="requestTime" width="150"/>
+      <el-table-column label="响应时间" prop="responseTime" width="150"/>
+      <el-table-column label="响应编码" prop="responseCode" width="150"/>
+      <el-table-column label="响应消息" prop="responseMessage" width="150"/>
+      <el-table-column label="调用方IP" prop="clientIp" width="150"/>
+      <el-table-column label="服务器IP" prop="requestParams" width="150"/>
+      <el-table-column label="调用参数" prop="responseData" width="150"/>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
@@ -107,7 +95,7 @@
 import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // Waves directive
 import { parseTime } from '@/utils'
-import { request,post } from '@/utils/req.js'
+import { request, post } from '@/utils/req.js'
 import { obj2formdatastr } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -127,7 +115,7 @@ const sortOptions = [
   { key: 'street', label: '镇街管理' },
   { key: 'service', label: '服务提供管控日志' },
   { key: 'matter', label: '事项管理' },
-  { key: 'public', label: '舆情分析配置' },
+  { key: 'public', label: '舆情分析配置' }
 ]
 
 // arr to obj ,such as { CN : "China", US : "USA" }
@@ -203,10 +191,10 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      let params = obj2formdatastr({
-          account: 'dgdp',
-          page: this.listQuery.page,
-          size: this.listQuery.limit,
+      const params = obj2formdatastr({
+        account: 'dgdp',
+        page: this.listQuery.page,
+        size: this.listQuery.limit
       })
       request('/sg/base/logApiRequest/findByAccount?' + params).then(data => {
         this.list = data.content
@@ -219,11 +207,11 @@ export default {
       })
     },
     indexMethod(index) {
-      return (index+1) + 10 * (this.listQuery.page-1);
+      return (index + 1) + 10 * (this.listQuery.page - 1)
     },
     changeTopics() {
       // 路由跳转
-      this.$router.push({path: '/'+this.listQuery.type+'/index'})
+      this.$router.push({ path: '/' + this.listQuery.type + '/index' })
     },
     handleFilter() {
       request('/sg/citymanagement/' + this.listQuery.id).then(data => {
@@ -346,12 +334,12 @@ export default {
     },
     handleDownload() {
       this.downloadLoading = true
-      let params = obj2formdatastr({
-          account: 'dgdp',
-          page: this.listQuery.page,
-          size: this.listQuery.limit,
+      const params = obj2formdatastr({
+        account: 'dgdp',
+        page: this.listQuery.page,
+        size: this.listQuery.limit
       })
-      window.location.href="http://12345v1.dgdatav.com:6080/api/sg/base/logApiRequest/export?" + params;
+      window.location.href = 'http://12345v1.dgdatav.com:6080/api/sg/base/logApiRequest/export?' + params
       request('/sg/base/logApiRequest/export?' + params).then(data => {
         this.downloadLoading = false
       })
@@ -373,6 +361,4 @@ export default {
   margin-right: 20px;
 }
 </style>
-
-
 

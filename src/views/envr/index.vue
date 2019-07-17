@@ -3,7 +3,7 @@
     <div class="filter-container">
       <div>
         ID查询：
-        <el-input placeholder="请输入订单编号" v-model="listQuery.id" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+        <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       </div>
       <div>
         状态：
@@ -32,8 +32,7 @@
       highlight-current-row
       style="width: 100%;"
       @sort-change="sortChange">
-      <el-table-column type="index" :index="indexMethod" label="序号" sortable="custom" align="center" width="75">
-      </el-table-column>
+      <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
       <el-table-column label="标题" prop="title" min-width="200">
         <!-- <template slot-scope="scope">
           <span>{{ scope.row.title }}</span>
@@ -118,7 +117,7 @@
 import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // Waves directive
 import { parseTime } from '@/utils'
-import { request,post } from '@/utils/req.js'
+import { request, post } from '@/utils/req.js'
 import { obj2formdatastr } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -138,7 +137,7 @@ const sortOptions = [
   { key: 'street', label: '镇街管理' },
   { key: 'service', label: '服务提供管控日志' },
   { key: 'matter', label: '事项管理' },
-  { key: 'public', label: '舆情分析配置' },
+  { key: 'public', label: '舆情分析配置' }
 ]
 
 // arr to obj ,such as { CN : "China", US : "USA" }
@@ -214,13 +213,13 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      let params = obj2formdatastr({
-          month: '201812',
-          pageNumber: this.listQuery.page,
-          pageSize: this.listQuery.limit,
-          state: this.listQuery.state,
-          property: 'acceptTime',
-          direction: 'DESC',
+      const params = obj2formdatastr({
+        month: '201812',
+        pageNumber: this.listQuery.page,
+        pageSize: this.listQuery.limit,
+        state: this.listQuery.state,
+        property: 'acceptTime',
+        direction: 'DESC'
       })
       request('/sg/environment/findByPage?' + params).then(data => {
         this.list = data.content
@@ -233,11 +232,11 @@ export default {
       })
     },
     indexMethod(index) {
-      return (index+1) + 10 * (this.listQuery.page-1);
+      return (index + 1) + 10 * (this.listQuery.page - 1)
     },
     changeTopics() {
       // 路由跳转
-      this.$router.push({path: '/'+this.listQuery.type+'/index'})
+      this.$router.push({ path: '/' + this.listQuery.type + '/index' })
     },
     handleFilter() {
       request('/sg/environment/' + this.listQuery.id).then(data => {
@@ -360,15 +359,15 @@ export default {
     },
     handleDownload() {
       this.downloadLoading = true
-      let params = obj2formdatastr({
-          month: '201812',
-          pageNumber: this.listQuery.page,
-          pageSize: this.listQuery.limit,
-          state: this.listQuery.state,
-          property: 'acceptTime',
-          direction: 'DESC',
+      const params = obj2formdatastr({
+        month: '201812',
+        pageNumber: this.listQuery.page,
+        pageSize: this.listQuery.limit,
+        state: this.listQuery.state,
+        property: 'acceptTime',
+        direction: 'DESC'
       })
-      window.location.href="http://12345v1.dgdatav.com:6080/api/sg/environment/export?" + params;
+      window.location.href = 'http://12345v1.dgdatav.com:6080/api/sg/environment/export?' + params
       request('/sg/environment/export?' + params).then(data => {
         this.downloadLoading = false
       })
@@ -391,6 +390,4 @@ export default {
   justify-content: space-between;
 }
 </style>
-
-
 

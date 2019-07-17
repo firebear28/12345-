@@ -3,7 +3,7 @@
     <div class="filter-container">
       <div>
         ID查询：
-        <el-input placeholder="请输入订单编号" v-model="listQuery.id" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+        <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       </div>
       <div>
         名称：
@@ -32,24 +32,15 @@
       highlight-current-row
       style="width: 100%;"
       @sort-change="sortChange">
-      <el-table-column type="index" :index="indexMethod" label="序号" sortable="custom" align="center" width="75">
-      </el-table-column>
-      <el-table-column label="事项id" prop="itemId" width="100">
-      </el-table-column>
-      <el-table-column label="事项名称" prop="itemName" min-width="150">
-      </el-table-column>
-      <el-table-column label="上级事项id" prop="pid" width="150">
-      </el-table-column>
-      <el-table-column label="事项类型" prop="itemType" align="center" width="135">
-      </el-table-column>
-      <el-table-column label="事项部门" prop="itemDepart" align="center" width="135">
-      </el-table-column>
-      <el-table-column label="源事项id" prop="subItemId" align="center" width="135">
-      </el-table-column>
-      <el-table-column label="源事项名称" prop="subItemName" align="center" width="135">
-      </el-table-column>
-      <el-table-column label="事项来源" prop="subIden" align="center" width="150">
-      </el-table-column>
+      <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
+      <el-table-column label="事项id" prop="itemId" width="100"/>
+      <el-table-column label="事项名称" prop="itemName" min-width="150"/>
+      <el-table-column label="上级事项id" prop="pid" width="150"/>
+      <el-table-column label="事项类型" prop="itemType" align="center" width="135"/>
+      <el-table-column label="事项部门" prop="itemDepart" align="center" width="135"/>
+      <el-table-column label="源事项id" prop="subItemId" align="center" width="135"/>
+      <el-table-column label="源事项名称" prop="subItemName" align="center" width="135"/>
+      <el-table-column label="事项来源" prop="subIden" align="center" width="150"/>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
@@ -131,7 +122,7 @@ const sortOptions = [
   { key: 'street', label: '镇街管理' },
   { key: 'service', label: '服务提供管控日志' },
   { key: 'matter', label: '事项管理' },
-  { key: 'public', label: '舆情分析配置' },
+  { key: 'public', label: '舆情分析配置' }
 ]
 
 // arr to obj ,such as { CN : "China", US : "USA" }
@@ -185,7 +176,7 @@ export default {
         itemDepart: '',
         subItemId: '',
         subItemName: '',
-        subIden: '',
+        subIden: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -209,9 +200,9 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      let params = obj2formdatastr({
-          page: this.listQuery.page,
-          size: this.listQuery.limit,
+      const params = obj2formdatastr({
+        page: this.listQuery.page,
+        size: this.listQuery.limit
       })
       request('/sg/twoconitem/findByPage?' + params).then(data => {
         this.list = data.content
@@ -224,11 +215,11 @@ export default {
       })
     },
     indexMethod(index) {
-      return (index+1) + 10 * (this.listQuery.page-1);
+      return (index + 1) + 10 * (this.listQuery.page - 1)
     },
     changeTopics() {
       // 路由跳转
-      this.$router.push({path: '/'+this.listQuery.type+'/index'})
+      this.$router.push({ path: '/' + this.listQuery.type + '/index' })
     },
     handleFilter() {
       request('/sg/twoconitem/' + this.listQuery.id).then(data => {
@@ -280,7 +271,7 @@ export default {
         itemDepart: '',
         subItemId: '',
         subItemName: '',
-        subIden: '',
+        subIden: ''
       }
     },
     handleCreate() {
@@ -356,12 +347,12 @@ export default {
     // 导出
     handleDownload() {
       this.downloadLoading = true
-      let params = obj2formdatastr({
-          page: this.listQuery.page,
-          size: this.listQuery.limit,
+      const params = obj2formdatastr({
+        page: this.listQuery.page,
+        size: this.listQuery.limit
       })
       request('/sg/twoconitem/export?' + params).then(data => {
-        window.location.href="http://12345v1.dgdatav.com:6080/api/sg/twoconitem/export?" + params;
+        window.location.href = 'http://12345v1.dgdatav.com:6080/api/sg/twoconitem/export?' + params
         this.downloadLoading = false
       })
     },
@@ -383,6 +374,4 @@ export default {
   justify-content: space-between;
 }
 </style>
-
-
 

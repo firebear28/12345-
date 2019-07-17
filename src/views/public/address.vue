@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="filter-container">
       ID查询：
-      <el-input placeholder="请输入订单编号" v-model="listQuery.id" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       名称：
       <el-select v-model="listQuery.state" placeholder="请选择名称" clearable class="filter-item" style="width: 130px" @change="getList">
         <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.label" :value="item.key"/>
@@ -24,14 +24,10 @@
       highlight-current-row
       style="width: 100%;"
       @sort-change="sortChange">
-      <el-table-column type="index" :index="indexMethod" label="序号" sortable="custom" align="center" width="75">
-      </el-table-column>
-      <el-table-column label="主键" prop="bid" min-width="200">
-      </el-table-column>
-      <el-table-column label="网站地址" prop="address" width="300">
-      </el-table-column>
-      <el-table-column label="网站名称" prop="webName" width="300">
-      </el-table-column>
+      <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
+      <el-table-column label="主键" prop="bid" min-width="200"/>
+      <el-table-column label="网站地址" prop="address" width="300"/>
+      <el-table-column label="网站名称" prop="webName" width="300"/>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
@@ -98,7 +94,7 @@ const sortOptions = [
   { key: 'street', label: '镇街管理' },
   { key: 'service', label: '服务提供管控日志' },
   { key: 'matter', label: '事项管理' },
-  { key: 'public', label: '舆情分析配置' },
+  { key: 'public', label: '舆情分析配置' }
 ]
 
 // arr to obj ,such as { CN : "China", US : "USA" }
@@ -146,7 +142,7 @@ export default {
       temp: {
         bid: '',
         keyword: '',
-        type: '',
+        type: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -159,7 +155,7 @@ export default {
       rules: {
         bid: [{ required: true, message: 'type is required', trigger: 'change' }],
         address: [{ required: true, message: 'type is required', trigger: 'change' }],
-        webName: [{ required: true, message: 'type is required', trigger: 'change' }],
+        webName: [{ required: true, message: 'type is required', trigger: 'change' }]
       },
       downloadLoading: false
     }
@@ -170,9 +166,9 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      let params = obj2formdatastr({
-          page: this.listQuery.page,
-          size: this.listQuery.limit,
+      const params = obj2formdatastr({
+        page: this.listQuery.page,
+        size: this.listQuery.limit
       })
       request('/sg/item/sgSentimentAddress/findByPage?' + params).then(data => {
         this.list = data.content
@@ -185,20 +181,20 @@ export default {
       })
     },
     indexMethod(index) {
-      return (index+1) + 10 * (this.listQuery.page-1);
+      return (index + 1) + 10 * (this.listQuery.page - 1)
     },
     changeTopics() {
       // 路由跳转
-      this.$router.push({path: '/'+this.listQuery.type+'/index'})
+      this.$router.push({ path: '/' + this.listQuery.type + '/index' })
     },
     handleFilter() {
       request('/sg/item/sgSentimentAddress/' + this.listQuery.id).then(data => {
-        if(data.length != 0){
+        if (data.length != 0) {
           this.list = []
           this.list.push(data)
           this.listQuery.page = 1
           this.total = 1
-        }else{
+        } else {
           this.list = []
           this.listQuery.page = 0
           this.total = 0
@@ -240,7 +236,7 @@ export default {
       this.temp = {
         bid: '',
         address: '',
-        webName: '',
+        webName: ''
       }
     },
     handleCreate() {
@@ -313,11 +309,11 @@ export default {
     },
     handleDownload() {
       this.downloadLoading = true
-      let params = obj2formdatastr({
-          page: this.listQuery.page,
-          size: this.listQuery.limit,
+      const params = obj2formdatastr({
+        page: this.listQuery.page,
+        size: this.listQuery.limit
       })
-      window.location.href="http://12345v1.dgdatav.com:6080/api/sg/item/sgSentimentAddress/export?" + params;
+      window.location.href = 'http://12345v1.dgdatav.com:6080/api/sg/item/sgSentimentAddress/export?' + params
       request('/sg/item/sgSentimentAddress/export?' + params).then(data => {
         this.downloadLoading = false
       })
@@ -339,6 +335,4 @@ export default {
   margin-right: 20px;
 }
 </style>
-
-
 
