@@ -30,7 +30,7 @@ axios.interceptors.request.use(config => {
   config.baseURL = process.env.NODE_ENV === 'development' ? 'http://12345v2.alltosea.com:6080/api' : '/api'
 
   // 设置公共GET参数(由于本项目的后端接口只有GET请求,所以只需要处理GET请求即可，如果需要POST则设置data参数)
-  // config.params = { tokenid: getToken(), userAgent: getUserAgent() }
+  if (config.url.indexOf('admin/user/sysUser') !== -1) { config.params = { tokenid: getToken(), userAgent: getUserAgent() } }
 
   // 获取纯Url（不包含?后面的参数）(也不包含baseURL的前缀)
   const pureUrl = getPureUrl(config.url)

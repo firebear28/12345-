@@ -200,6 +200,63 @@ export const constantRouterMap = [
         }
       }
     ]
+  },
+  // 获取服务器资源信息
+  {
+    path: '/resourcesServer',
+    component: Layout,
+    redirect: '/resourcesServer/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/resourcesServer/index'),
+        name: 'resourcesServer',
+        meta: { title: 'resourcesServer', icon: 'guide', noCache: true }
+      }
+    ]
+  },
+  // 服务管控
+  {
+    path: '/managerServer',
+    component: Layout,
+    redirect: '/managerServer/SgService',
+    alwaysShow: true, // will always show the root menu
+    meta: {
+      title: 'managerServer',
+      icon: 'guide'
+    },
+    children: [
+      {
+        path: 'SgService',
+        component: () => import('@/views/managerServer/SgService'),
+        name: 'PagePermission',
+        meta: {
+          title: 'managerServer-SgService'
+        }
+      },
+      {
+        path: 'sgServiceUser',
+        component: () => import('@/views/managerServer/sgServiceUser'),
+        name: 'DirectivePermission',
+        meta: {
+          title: 'managerServer-sgServiceUser'
+        }
+      }
+    ]
+  },
+  // 预警阀值
+  {
+    path: '/warning',
+    component: Layout,
+    redirect: '/warning/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/warning/index'),
+        name: 'warning',
+        meta: { title: 'warning', icon: 'guide', noCache: true }
+      }
+    ]
   }
 ]
 

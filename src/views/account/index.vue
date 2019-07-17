@@ -11,7 +11,7 @@
           @keyup.enter.native="handleFilter"
         />
       </div>
-      <div>
+      <!-- <div>
         名称：
         <el-select
           v-model="listQuery.state"
@@ -46,7 +46,7 @@
             :value="item.key"
           />
         </el-select>
-      </div>
+      </div>-->
       <div>
         <el-button
           v-waves
@@ -62,14 +62,14 @@
           icon="el-icon-edit"
           @click="handleCreate"
         >新增</el-button>
-        <el-button
+        <!-- <el-button
           v-waves
           :loading="downloadLoading"
           class="filter-item"
           type="primary"
           icon="el-icon-download"
           @click="handleDownload"
-        >导出</el-button>
+        >导出</el-button>-->
       </div>
     </div>
 
@@ -89,10 +89,10 @@
         align="center"
         width="75"
       />
-      <el-table-column label="名称" prop="fullname" width="120"/>
-      <el-table-column label="登陆账号" prop="account" width="200"/>
-      <el-table-column label="邮件" prop="email" min-width="200"/>
-      <el-table-column label="手机号" prop="mobile" align="center" width="220"/>
+      <el-table-column label="名称" prop="fullname" width="120" />
+      <el-table-column label="登陆账号" prop="account" width="200" />
+      <el-table-column label="邮件" prop="email" min-width="200" />
+      <el-table-column label="手机号" prop="mobile" align="center" width="220" />
       <el-table-column label="操作" align="center" width="260" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="warning" size="mini" @click="grtIP(scope.row)">IP管理</el-button>
@@ -119,22 +119,22 @@
         style="width: 400px; margin-left:50px;"
       >
         <el-form-item label="名称" prop="fullname">
-          <el-input v-model="temp.fullname"/>
+          <el-input v-model="temp.fullname" />
         </el-form-item>
         <el-form-item label="账号类型" prop="accounttype">
-          <el-input v-model="temp.accounttype"/>
+          <el-input v-model="temp.accounttype" />
         </el-form-item>
         <el-form-item label="登录账号" prop="account">
-          <el-input v-model="temp.account"/>
+          <el-input v-model="temp.account" />
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input v-model="temp.password"/>
+          <el-input v-model="temp.password" />
         </el-form-item>
         <el-form-item label="邮件" prop="email">
-          <el-input v-model="temp.email"/>
+          <el-input v-model="temp.email" />
         </el-form-item>
         <el-form-item label="手机号" prop="mobile">
-          <el-input v-model="temp.mobile"/>
+          <el-input v-model="temp.mobile" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -144,9 +144,16 @@
     </el-dialog>
 
     <el-dialog :visible.sync="ipFormVisible" title="IP管理">
-      <el-table v-loading="ipLoading" :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="account" label="用户名"/>
-        <el-table-column prop="clientIp" label="IP"/>
+      <el-table
+        v-loading="ipLoading"
+        :data="pvData"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%"
+      >
+        <el-table-column prop="account" label="用户名" />
+        <el-table-column prop="clientIp" label="IP" />
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button size="mini" type="danger" @click="handleDeleteIP(scope.row)">删除</el-button>
@@ -172,7 +179,7 @@
       </div>
       <!-- <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="ipFormVisible = false">确认</el-button>
-      </span> -->
+      </span>-->
     </el-dialog>
   </div>
 </template>
@@ -266,9 +273,7 @@ export default {
       this.temp = Object.assign({}, row) // copy obj
       this.ipFormVisible = true
       this.ipLoading = true
-      request(
-        `/sg/base/sgUserIp/search?eq_userid=${row.userid}`
-      ).then(data => {
+      request(`/sg/base/sgUserIp/search?eq_userid=${row.userid}`).then(data => {
         this.pvData = data.rows
         setTimeout(() => {
           this.ipLoading = false
@@ -276,15 +281,14 @@ export default {
       })
     },
     handleDeleteIP(row) {
-      post(
-        `/sg/base/sgUserIp/delete?id=${row.userIpId}`
-      ).then(data => {
-        this.$message({
-          message: '删除成功',
-          type: 'success'
+      post(`/sg/base/sgUserIp/delete?id=${row.userIpId}`)
+        .then(data => {
+          this.$message({
+            message: '删除成功',
+            type: 'success'
+          })
+          this.grtIP(row)
         })
-        this.grtIP(row)
-      })
         .catch(() => {
           this.$message({
             message: '删除失败',
@@ -293,21 +297,21 @@ export default {
         })
     },
     handleCreateIP(row) {
-      request(
-        `/sg/base/sgUserIp`, {
-          method: 'post',
-          data: {
-            'account': this.temp.account,
-            'clientIp': this.createIP,
-            'userid': this.temp.userid
-          }
-        }).then(data => {
-        this.$message({
-          message: '新建成功',
-          type: 'success'
-        })
-        this.grtIP(this.temp)
+      request(`/sg/base/sgUserIp`, {
+        method: 'post',
+        data: {
+          account: this.temp.account,
+          clientIp: this.createIP,
+          userid: this.temp.userid
+        }
       })
+        .then(data => {
+          this.$message({
+            message: '新建成功',
+            type: 'success'
+          })
+          this.grtIP(this.temp)
+        })
         .catch(() => {
           this.$message({
             message: '新建失败',
@@ -318,7 +322,9 @@ export default {
     getList() {
       this.listLoading = true
       request(
-        `/admin/user/sysUser/search?size=${this.listQuery.limit}&page=${this.listQuery.page - 1}&tokenid=${getToken()}&userAgent=${getUserAgent()}`
+        `/admin/user/sysUser/search?size=${this.listQuery.limit}&page=${this
+          .listQuery.page -
+          1}&tokenid=${getToken()}&userAgent=${getUserAgent()}`
       ).then(data => {
         this.list = data.rows
         this.total = data.total
