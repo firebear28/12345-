@@ -52,12 +52,12 @@ const user = {
 
   actions: {
     // 用户名登录
-    LoginByUsername({ state,commit, dispatch }, userInfo) {
+    LoginByUsername({ state, commit, dispatch }, userInfo) {
       const username = userInfo.username.trim()
       return request('/admin/user/sysUser/login', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'},
-          data: qs.stringify({ userAccount: username, userPwd: userInfo.password, type: 'account' })
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' },
+        data: qs.stringify({ userAccount: username, userPwd: userInfo.password, type: 'account' })
       }).then(data => {
         if (data.code === 200) {
           state.token = data.user.tokenId
@@ -66,7 +66,7 @@ const user = {
           dispatch('GetUserInfo')
           setToken(data.user.tokenId)
           setUserAgent(data.user.userAgent)
-        }else {
+        } else {
           Message('登陆失败：' + data.message)
         }
       }).catch(error => {

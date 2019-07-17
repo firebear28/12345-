@@ -6,13 +6,6 @@ Vue.use(Router)
 /* Layout */
 import Layout from '@/views/layout/Layout'
 
-/* Router Modules */
-import componentsRouter from './modules/components'
-import chartsRouter from './modules/charts'
-import tableRouter from './modules/table'
-import treeTableRouter from './modules/tree-table'
-import nestedRouter from './modules/nested'
-
 /** note: sub-menu only appear when children.length>=1
  *  detail see  https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
  **/
@@ -50,21 +43,6 @@ export const constantRouterMap = [
     component: () => import('@/views/login/index'),
     hidden: true
   },
-  {
-    path: '/auth-redirect',
-    component: () => import('@/views/login/authredirect'),
-    hidden: true
-  },
-  {
-    path: '/404',
-    component: () => import('@/views/errorPage/404'),
-    hidden: true
-  },
-  {
-    path: '/401',
-    component: () => import('@/views/errorPage/401'),
-    hidden: true
-  },
   // 首页
   {
     path: '',
@@ -79,20 +57,6 @@ export const constantRouterMap = [
       }
     ]
   },
-  // 文档
-  // {
-  //   path: '/documentation',
-  //   component: Layout,
-  //   redirect: '/documentation/index',
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/documentation/index'),
-  //       name: 'Documentation',
-  //       meta: { title: 'documentation', icon: 'documentation', affix: true }
-  //     }
-  //   ]
-  // },
   // 城市管理
   {
     path: '/city',
@@ -101,9 +65,9 @@ export const constantRouterMap = [
     children: [
       {
         path: 'index',
-        component: () => import('@/pages/city/index'),
+        component: () => import('@/views/city/index'),
         name: 'city',
-        meta: { title: '城市管理', icon: 'guide', noCache: true }
+        meta: { title: 'city', icon: 'guide', noCache: true }
       }
     ]
   },
@@ -115,9 +79,9 @@ export const constantRouterMap = [
     children: [
       {
         path: 'index',
-        component: () => import('@/pages/admn/index'),
+        component: () => import('@/views/admn/index'),
         name: 'admn',
-        meta: { title: '行政效能', icon: 'guide', noCache: true }
+        meta: { title: 'admn', icon: 'guide', noCache: true }
       }
     ]
   },
@@ -129,9 +93,9 @@ export const constantRouterMap = [
     children: [
       {
         path: 'index',
-        component: () => import('@/pages/envr/index'),
+        component: () => import('@/views/envr/index'),
         name: 'envr',
-        meta: { title: '环境保护', icon: 'guide', noCache: true }
+        meta: { title: 'envr', icon: 'guide', noCache: true }
       }
     ]
   },
@@ -143,9 +107,9 @@ export const constantRouterMap = [
     children: [
       {
         path: 'index',
-        component: () => import('@/pages/depa/index'),
+        component: () => import('@/views/depa/index'),
         name: 'depa',
-        meta: { title: '部门管理', icon: 'guide', noCache: true }
+        meta: { title: 'depa', icon: 'guide', noCache: true }
       }
     ]
   },
@@ -157,9 +121,9 @@ export const constantRouterMap = [
     children: [
       {
         path: 'index',
-        component: () => import('@/pages/account/index'),
+        component: () => import('@/views/account/index'),
         name: 'account',
-        meta: { title: '用户管理', icon: 'guide', noCache: true }
+        meta: { title: 'account', icon: 'guide', noCache: true }
       }
     ]
   },
@@ -171,9 +135,9 @@ export const constantRouterMap = [
     children: [
       {
         path: 'index',
-        component: () => import('@/pages/street/index'),
+        component: () => import('@/views/street/index'),
         name: 'street',
-        meta: { title: '镇街管理', icon: 'guide', noCache: true }
+        meta: { title: 'street', icon: 'guide', noCache: true }
       }
     ]
   },
@@ -185,9 +149,9 @@ export const constantRouterMap = [
     children: [
       {
         path: 'index',
-        component: () => import('@/pages/service/index'),
+        component: () => import('@/views/service/index'),
         name: 'service',
-        meta: { title: '服务提供管控日志', icon: 'guide', noCache: true }
+        meta: { title: 'service', icon: 'guide', noCache: true }
       }
     ]
   },
@@ -199,9 +163,9 @@ export const constantRouterMap = [
     children: [
       {
         path: 'index',
-        component: () => import('@/pages/matter/index'),
+        component: () => import('@/views/matter/index'),
         name: 'matter',
-        meta: { title: '事项管理', icon: 'guide', noCache: true }
+        meta: { title: 'matter', icon: 'guide', noCache: true }
       }
     ]
   },
@@ -212,31 +176,31 @@ export const constantRouterMap = [
     redirect: '/public/key',
     alwaysShow: true, // will always show the root menu
     meta: {
-      title: '舆情分析配置',
-      icon: 'guide',
+      title: 'public',
+      icon: 'guide'
       // roles: ['admin', 'editor'] // you can set roles in root nav
     },
     children: [
       {
         path: 'key',
-        component: () => import('@/pages/public/key'),
+        component: () => import('@/views/public/key'),
         name: 'PagePermission',
         meta: {
-          title: '舆情关键字',
+          title: 'public-key'
           // roles: ['admin'] // or you can only set roles in sub nav
         }
       },
       {
         path: 'address',
-        component: () => import('@/pages/public/address'),
+        component: () => import('@/views/public/address'),
         name: 'DirectivePermission',
         meta: {
-          title: '舆情地址表'
+          title: 'public-address'
           // if do not set roles, means: this page does not require permission
         }
       }
     ]
-  },
+  }
 ]
 
 export default new Router({

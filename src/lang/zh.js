@@ -1,6 +1,17 @@
 export default {
   route: {
     dashboard: '首页',
+    city: '城市管理',
+    admn: '行政效能',
+    envr: '环境保护',
+    depa: '部门管理',
+    account: '用户管理',
+    street: '镇街管理',
+    service: '服务提供管控日志',
+    matter: '事项管理',
+    public: '舆情分析配置',
+    'public-key': '舆情关键字',
+    'public-address': '舆情地址表',
     introduction: '简述',
     documentation: '文档',
     guide: '引导页',
@@ -20,7 +31,6 @@ export default {
     sticky: 'Sticky',
     countTo: 'CountTo',
     componentMixin: '小组件',
-    backToTop: '返回顶部',
     dragDialog: '拖拽 Dialog',
     dragSelect: '拖拽 Select',
     dragKanban: '可拖拽看板',
@@ -99,8 +109,6 @@ export default {
     tinymceTips: '富文本是管理后台一个核心的功能，但同时又是一个有很多坑的地方。在选择富文本的过程中我也走了不少的弯路，市面上常见的富文本都基本用过了，最终权衡了一下选择了Tinymce。更详细的富文本比较和介绍见',
     dropzoneTips: '由于我司业务有特殊需求，而且要传七牛 所以没用第三方，选择了自己封装。代码非常的简单，具体代码你可以在这里看到 @/components/Dropzone',
     stickyTips: '当页面滚动到预设的位置会吸附在顶部',
-    backToTopTips1: '页面滚动到指定位置会在右下角出现返回顶部按钮',
-    backToTopTips2: '可自定义按钮的样式、show/hide、出现的高度、返回的位置 如需文字提示，可在外部使用Element的el-tooltip元素',
     imageUploadTips: '由于我在使用时它只有vue@1版本，而且和mockjs不兼容，所以自己改造了一下，如果大家要使用的话，优先还是使用官方版本。'
   },
   table: {
