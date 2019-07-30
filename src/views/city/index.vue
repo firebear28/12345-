@@ -78,10 +78,9 @@
       <el-table-column label="专题标签" prop="subTags" width="150"/>
       <el-table-column label="专题分类的准确率" prop="subClazzProba" align="center" width="135"/>
       <el-table-column label="专题标签的准确率" prop="subTagsProba" align="center" width="135"/>
-      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="100" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -278,13 +277,7 @@ export default {
         }, 0.5 * 1000)
       })
     },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作成功',
-        type: 'success'
-      })
-      row.status = status
-    },
+    // 重置
     resetTemp() {
       this.temp = {
         id: undefined,
@@ -296,6 +289,7 @@ export default {
         type: ''
       }
     },
+    // 新建
     handleCreate() {
       this.resetTemp()
       this.dialogStatus = 'create'
@@ -304,6 +298,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
+    // 新建的提交
     createData() {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
@@ -322,6 +317,7 @@ export default {
         }
       })
     },
+    // 编辑
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp)
@@ -331,6 +327,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
+    // 修改的提交
     updateData() {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
@@ -355,6 +352,7 @@ export default {
         }
       })
     },
+    // 删除
     handleDelete(row) {
       this.$notify({
         title: '成功',
@@ -365,12 +363,7 @@ export default {
       const index = this.list.indexOf(row)
       this.list.splice(index, 1)
     },
-    handleFetchPv(pv) {
-      fetchPv(pv).then(response => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
-    },
+    // 切换时间
     changeDtae() {
       this.getList()
     },
@@ -390,17 +383,6 @@ export default {
       request('/sg/citymanagement/export?' + params).then(data => {
         this.downloadLoading = false
       })
-    },
-    formatJson(filterVal, jsonData) {
-      return jsonData.map(v =>
-        filterVal.map(j => {
-          if (j === 'timestamp') {
-            return parseTime(v[j])
-          } else {
-            return v[j]
-          }
-        })
-      )
     }
   }
 }
