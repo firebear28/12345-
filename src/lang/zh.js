@@ -2,6 +2,7 @@ export default {
   route: {
     dashboard: '首页',
     city: '城市管理',
+    traffic: '交通管理',
     admn: '行政效能',
     envr: '环境保护',
     depa: '部门管理',

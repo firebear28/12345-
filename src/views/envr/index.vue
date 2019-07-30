@@ -33,31 +33,11 @@
       style="width: 100%;"
       @sort-change="sortChange">
       <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
-      <el-table-column label="标题" prop="title" min-width="200">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.title }}</span>
-        </template> -->
-      </el-table-column>
-      <el-table-column label="专题分类" prop="subClazz" width="150">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subClazz }}</span>
-        </template> -->
-      </el-table-column>
-      <el-table-column label="专题标签" prop="subTags" width="150">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subTags }}</span>
-        </template> -->
-      </el-table-column>
-      <el-table-column label="专题分类的准确率" prop="subClazzProba" align="center" width="135">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subClazzProba }}</span>
-        </template> -->
-      </el-table-column>
-      <el-table-column label="专题标签的准确率" prop="subTagsProba" align="center" width="135">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subTagsProba }}</span>
-        </template> -->
-      </el-table-column>
+      <el-table-column label="标题" prop="title" min-width="200"/>
+      <el-table-column label="专题分类" prop="subClazz" width="150"/>
+      <el-table-column label="专题标签" prop="subTags" width="150"/>
+      <el-table-column label="专题分类的准确率" prop="subClazzProba" align="center" width="135"/>
+      <el-table-column label="专题标签的准确率" prop="subTagsProba" align="center" width="135"/>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
@@ -70,33 +50,32 @@
     <pagination :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item :label="$t('table.type')" prop="type">
-          <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key"/>
-          </el-select>
+      <el-form
+        ref="dataForm"
+        :rules="rules"
+        :model="temp"
+        label-width="130px"
+        style="width: 400px; margin-left:50px;"
+      >
+        <el-form-item label="标题" prop="title">
+          <el-input v-model="temp.title" />
         </el-form-item>
-        <!-- <el-form-item :label="$t('table.date')" prop="timestamp">
-          <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date"/>
-        </el-form-item> -->
-        <el-form-item :label="$t('table.title')" prop="title">
-          <el-input v-model="temp.title"/>
+        <el-form-item label="专题分类" prop="subClazz">
+          <el-input v-model="temp.subClazz" />
         </el-form-item>
-        <el-form-item :label="$t('table.status')">
-          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item"/>
-          </el-select>
+        <el-form-item label="专题标签" prop="subTags">
+          <el-input v-model="temp.subTags" />
         </el-form-item>
-        <el-form-item :label="$t('table.importance')">
-          <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;"/>
+        <el-form-item label="专题分类的准确率" prop="subClazzProba">
+          <el-input v-model="temp.subClazzProba" />
         </el-form-item>
-        <el-form-item :label="$t('table.remark')">
-          <el-input :autosize="{ minRows: 2, maxRows: 4}" v-model="temp.remark" type="textarea" placeholder="Please input"/>
+        <el-form-item label="专题标签的准确率" prop="subTagsProba">
+          <el-input v-model="temp.subTagsProba" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">{{ $t('table.confirm') }}</el-button>
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">提交</el-button>
       </div>
     </el-dialog>
 

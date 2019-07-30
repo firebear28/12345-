@@ -3,24 +3,66 @@
     <div class="filter-container">
       <div>
         ID查询：
-        <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+        <el-input
+          v-model="listQuery.id"
+          placeholder="请输入订单编号"
+          style="width: 200px;"
+          class="filter-item"
+          @keyup.enter.native="handleFilter"
+        />
       </div>
       <div>
         状态：
-        <el-select v-model="listQuery.state" placeholder="请选择状态" clearable class="filter-item" style="width: 130px" @change="getList">
-          <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.label" :value="item.key"/>
+        <el-select
+          v-model="listQuery.state"
+          placeholder="请选择状态"
+          clearable
+          class="filter-item"
+          style="width: 130px"
+          @change="getList"
+        >
+          <el-option
+            v-for="item in calendarTypeOptions"
+            :key="item.key"
+            :label="item.label"
+            :value="item.key"
+          />
         </el-select>
       </div>
       <div>
         当前专题：
-        <el-select v-model="listQuery.type" placeholder="请选择专题" clearable style="width: 140px" class="filter-item" @change="changeTopics">
-          <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
+        <el-select
+          v-model="listQuery.type"
+          placeholder="请选择专题"
+          clearable
+          style="width: 140px"
+          class="filter-item"
+          @change="changeTopics"
+        >
+          <el-option
+            v-for="item in sortOptions"
+            :key="item.key"
+            :label="item.label"
+            :value="item.key"
+          />
         </el-select>
       </div>
       <div>
-        <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
-        <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button> -->
-        <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
+        <el-button
+          v-waves
+          class="filter-item"
+          type="primary"
+          icon="el-icon-search"
+          @click="handleFilter"
+        >查询</el-button>
+        <el-button
+          v-waves
+          :loading="downloadLoading"
+          class="filter-item"
+          type="primary"
+          icon="el-icon-download"
+          @click="handleDownload"
+        >导出</el-button>
       </div>
     </div>
 
@@ -31,43 +73,35 @@
       fit
       highlight-current-row
       style="width: 100%;"
-      @sort-change="sortChange">
-      <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
-      <el-table-column label="标题" prop="title" min-width="200">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.title }}</span>
-        </template> -->
-      </el-table-column>
-      <el-table-column label="专题分类" prop="subClazz" width="150">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subClazz }}</span>
-        </template> -->
-      </el-table-column>
-      <el-table-column label="专题标签" prop="subTags" width="150">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subTags }}</span>
-        </template> -->
-      </el-table-column>
-      <el-table-column label="专题分类的准确率" prop="subClazzProba" align="center" width="135">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subClazzProba }}</span>
-        </template> -->
-      </el-table-column>
-      <el-table-column label="专题标签的准确率" prop="subTagsProba" align="center" width="135">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subTagsProba }}</span>
-        </template> -->
-      </el-table-column>
+      @sort-change="sortChange"
+    >
+      <el-table-column
+        :index="indexMethod"
+        type="index"
+        label="序号"
+        sortable="custom"
+        align="center"
+        width="75"
+      />
+      <el-table-column label="标题" prop="title" min-width="200"/>
+      <el-table-column label="专题分类" prop="subClazz" width="150"/>
+      <el-table-column label="专题标签" prop="subTags" width="150"/>
+      <el-table-column label="专题分类的准确率" prop="subClazzProba" align="center" width="135"/>
+      <el-table-column label="专题标签的准确率" prop="subTagsProba" align="center" width="135"/>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">删除
-          </el-button>
+          <el-button size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+    <pagination
+      :total="total"
+      :page.sync="listQuery.page"
+      :limit.sync="listQuery.limit"
+      @pagination="getList"
+    />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form
@@ -101,19 +135,22 @@
 
     <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
       <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="Channel"/>
-        <el-table-column prop="pv" label="Pv"/>
+        <el-table-column prop="key" label="Channel" />
+        <el-table-column prop="pv" label="Pv" />
       </el-table>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogPvVisible = false">{{ $t('table.confirm') }}</el-button>
       </span>
     </el-dialog>
-
   </div>
 </template>
 
 <script>
-import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
+import {
+  fetchPv,
+  createArticle,
+  updateArticle
+} from '@/api/article'
 import waves from '@/directive/waves' // Waves directive
 import { parseTime } from '@/utils'
 import { request, post } from '@/utils/req.js'
@@ -199,9 +236,20 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        type: [
+          { required: true, message: 'type is required', trigger: 'change' }
+        ],
+        timestamp: [
+          {
+            type: 'date',
+            required: true,
+            message: 'timestamp is required',
+            trigger: 'change'
+          }
+        ],
+        title: [
+          { required: true, message: 'title is required', trigger: 'blur' }
+        ]
       },
       downloadLoading: false
     }
@@ -220,7 +268,7 @@ export default {
         property: 'acceptTime',
         direction: 'DESC'
       })
-      request('/sg/admn/findByPage?' + params).then(data => {
+      request('/sg/traffic/findByPage?' + params).then(data => {
         this.list = data.content
         this.total = data.totalElements
 
@@ -231,14 +279,14 @@ export default {
       })
     },
     indexMethod(index) {
-      return (index + 1) + 10 * (this.listQuery.page - 1)
+      return index + 1 + 10 * (this.listQuery.page - 1)
     },
     changeTopics() {
       // 路由跳转
       this.$router.push({ path: '/' + this.listQuery.type + '/index' })
     },
     handleFilter() {
-      request('/sg/admn/' + this.listQuery.id).then(data => {
+      request('/sg/traffic/' + this.listQuery.id).then(data => {
         this.list = []
         this.list.push(data)
         this.listQuery.page = 1
@@ -256,20 +304,6 @@ export default {
       })
       row.status = status
     },
-    sortChange(data) {
-    //   const { prop, order } = data
-    //   if (prop === 'id') {
-    //     this.sortByID(order)
-    //   }
-    },
-    // sortByID(order) {
-    //   if (order === 'ascending') {
-    //     this.listQuery.sort = '+id'
-    //   } else {
-    //     this.listQuery.sort = '-id'
-    //   }
-    //   this.handleFilter()
-    // },
     resetTemp() {
       this.temp = {
         id: undefined,
@@ -290,8 +324,10 @@ export default {
       })
     },
     createData() {
-      this.$refs['dataForm'].validate((valid) => {
+      this.$refs['dataForm'].validate(valid => {
         if (valid) {
+          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
+          this.temp.author = 'vue-element-admin'
           createArticle(this.temp).then(() => {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
@@ -307,6 +343,7 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
+      this.temp.timestamp = new Date(this.temp.timestamp)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -314,7 +351,7 @@ export default {
       })
     },
     updateData() {
-      this.$refs['dataForm'].validate((valid) => {
+      this.$refs['dataForm'].validate(valid => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
@@ -363,25 +400,29 @@ export default {
         property: 'acceptTime',
         direction: 'DESC'
       })
-      request('/sg/admn/export?' + params).then(data => {
-        window.location.href = 'http://12345v1.dgdatav.com:6080/api/sg/admn/export?' + params
+      window.location.href =
+        'http://12345v1.dgdatav.com:6080/api/sg/traffic/export?' +
+        params
+      request('/sg/traffic/export?' + params).then(data => {
         this.downloadLoading = false
       })
     },
     formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
-        } else {
-          return v[j]
-        }
-      }))
+      return jsonData.map(v =>
+        filterVal.map(j => {
+          if (j === 'timestamp') {
+            return parseTime(v[j])
+          } else {
+            return v[j]
+          }
+        })
+      )
     }
   }
 }
 </script>
 <style lang="scss" scoped>
-.filter-container{
+.filter-container {
   display: flex;
   justify-content: space-between;
 }

@@ -56,14 +56,6 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="140px" style="width: 500px; margin-left:50px;">
-        <!-- <el-form-item :label="$t('table.type')" prop="type">
-          <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key"/>
-          </el-select>
-        </el-form-item> -->
-        <!-- <el-form-item :label="$t('table.date')" prop="timestamp">
-          <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date"/>
-        </el-form-item> -->
         <el-form-item label="部门ID" prop="departId">
           <el-input v-model="temp.departId"/>
         </el-form-item>
@@ -97,14 +89,6 @@
         <el-form-item label="子系统部门父类型" prop="subRootDepartType">
           <el-input v-model="temp.subRootDepartType"/>
         </el-form-item>
-        <!-- <el-form-item :label="$t('table.status')">
-          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('table.importance')">
-          <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;"/>
-        </el-form-item> -->
         <el-form-item label="备注">
           <el-input :autosize="{ minRows: 2, maxRows: 4}" v-model="temp.remark" type="textarea" placeholder="Please input"/>
         </el-form-item>
@@ -129,7 +113,6 @@
 </template>
 
 <script>
-import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // Waves directive
 import { parseTime } from '@/utils'
 import { request, post } from '@/utils/req.js'
@@ -277,20 +260,6 @@ export default {
       })
       row.status = status
     },
-    sortChange(data) {
-    //   const { prop, order } = data
-    //   if (prop === 'id') {
-    //     this.sortByID(order)
-    //   }
-    },
-    // sortByID(order) {
-    //   if (order === 'ascending') {
-    //     this.listQuery.sort = '+id'
-    //   } else {
-    //     this.listQuery.sort = '-id'
-    //   }
-    //   this.handleFilter()
-    // },
     resetTemp() {
       this.temp = {
         departId: '',
@@ -367,12 +336,6 @@ export default {
       })
       const index = this.list.indexOf(row)
       this.list.splice(index, 1)
-    },
-    handleFetchPv(pv) {
-      fetchPv(pv).then(response => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
     },
     // 导出
     handleDownload() {
