@@ -3,121 +3,148 @@
     <div class="filter-container">
       <div>
         ID查询：
-        <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+        <el-input
+          v-model="listQuery.id"
+          placeholder="请输入订单编号"
+          style="width: 200px;"
+          clearable
+          @keyup.enter.native="handleFilter"
+          @clear="getList"
+        />
       </div>
       <div>
         状态：
-        <el-select v-model="listQuery.state" placeholder="请选择状态" clearable class="filter-item" style="width: 130px" @change="getList">
-          <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.label" :value="item.key"/>
+        <el-select
+          v-model="listQuery.state"
+          placeholder="请选择状态"
+          clearable
+          style="width: 130px"
+          @change="getList"
+        >
+          <el-option
+            v-for="item in calendarTypeOptions"
+            :key="item.key"
+            :label="item.label"
+            :value="item.key"
+          />
         </el-select>
       </div>
       <div>
-        当前专题：
-        <el-select v-model="listQuery.type" placeholder="请选择专题" clearable style="width: 140px" class="filter-item" @change="changeTopics">
-          <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
-        </el-select>
+        日期：
+        <el-date-picker
+          v-model="month"
+          type="month"
+          value-format="yyyyMM"
+          placeholder="选择月"
+          @change="changeDtae"
+        />
       </div>
       <div>
-        <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
-        <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button> -->
-        <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
+        <el-button v-waves type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
+        <el-button
+          v-waves
+          :loading="downloadLoading"
+          type="primary"
+          icon="el-icon-download"
+          @click="handleDownload"
+        >导出</el-button>
       </div>
     </div>
 
     <el-table
       v-loading="listLoading"
       :data="list"
+      empty-text
       border
       fit
       highlight-current-row
       style="width: 100%;"
-      @sort-change="sortChange">
-      <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
-      <el-table-column label="标题" prop="title" min-width="200">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.title }}</span>
-        </template> -->
-      </el-table-column>
-      <el-table-column label="专题分类" prop="subClazz" width="150">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subClazz }}</span>
-        </template> -->
-      </el-table-column>
-      <el-table-column label="专题标签" prop="subTags" width="150">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subTags }}</span>
-        </template> -->
-      </el-table-column>
-      <el-table-column label="专题分类的准确率" prop="subClazzProba" align="center" width="135">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subClazzProba }}</span>
-        </template> -->
-      </el-table-column>
-      <el-table-column label="专题标签的准确率" prop="subTagsProba" align="center" width="135">
-        <!-- <template slot-scope="scope">
-          <span>{{ scope.row.subTagsProba }}</span>
-        </template> -->
-      </el-table-column>
-      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
+    >
+      <el-table-column
+        :index="indexMethod"
+        type="index"
+        label="序号"
+        sortable="custom"
+        align="center"
+        width="75"
+      />
+      <el-table-column label="标题" prop="title" min-width="200" />
+      <el-table-column label="专题分类" prop="subClazz" width="150" />
+      <el-table-column label="专题标签" prop="subTags" width="150" />
+      <el-table-column label="专题分类的准确率" prop="subClazzProba" align="center" width="135" />
+      <el-table-column label="专题标签的准确率" prop="subTagsProba" align="center" width="135" />
+      <el-table-column label="操作" align="center" width="100" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">删除
-          </el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+    <pagination
+      :total="total"
+      :page.sync="listQuery.page"
+      :limit.sync="listQuery.limit"
+      @pagination="getList"
+    />
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog :visible.sync="dialogFormVisible" title="编辑">
       <el-form
         ref="dataForm"
-        :rules="rules"
         :model="temp"
-        label-width="130px"
-        style="width: 400px; margin-left:50px;"
+        label-width="140px"
+        style="width: 500px; margin-left:50px;"
       >
-        <el-form-item label="标题" prop="title">
-          <el-input v-model="temp.title" />
+        <el-form-item label="标题：" prop="title">
+          <span>{{ temp.title }}</span>
         </el-form-item>
-        <el-form-item label="专题分类" prop="subClazz">
-          <el-input v-model="temp.subClazz" />
+        <el-form-item label="状态：" prop="state">
+          <el-select v-model="temp.state" placeholder="请选择状态" clearable>
+            <el-option
+              v-for="item in calendarTypeOptions"
+              :key="item.key"
+              :label="item.label"
+              :value="item.key"
+            />
+          </el-select>
         </el-form-item>
-        <el-form-item label="专题标签" prop="subTags">
-          <el-input v-model="temp.subTags" />
+        <el-form-item label="专题分类：" prop="subClazz">
+          <el-input v-model="temp.subClazz" style="width:200px"/>
         </el-form-item>
-        <el-form-item label="专题分类的准确率" prop="subClazzProba">
-          <el-input v-model="temp.subClazzProba" />
+        <el-form-item label="专题标签：" prop="subTags">
+          <!-- <el-cascader
+            ref="cascader"
+            :options="matterItems"
+            :props="props"
+            v-model="temp.subTags"
+            :show-all-levels="false"
+            placeholder="请选择"
+            filterable
+            clearable
+          /> -->
+          <span>{{ temp.subTags }}</span>
         </el-form-item>
-        <el-form-item label="专题标签的准确率" prop="subTagsProba">
-          <el-input v-model="temp.subTagsProba" />
+        <el-form-item label="专题分类的准确率：" prop="subClazzProba">
+          <span>{{ temp.subClazzProba }}</span>
+        </el-form-item>
+        <el-form-item label="专题标签的准确率：" prop="subTagsProba">
+          <span>{{ temp.subTagsProba }}</span>
+        </el-form-item>
+        <el-form-item label="投诉内容：" prop="content">
+          <div class="content">{{ temp.content }}</div>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">提交</el-button>
+        <el-button type="primary" @click="updateData()">提交</el-button>
       </div>
     </el-dialog>
-
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="Channel"/>
-        <el-table-column prop="pv" label="Pv"/>
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">{{ $t('table.confirm') }}</el-button>
-      </span>
-    </el-dialog>
-
   </div>
 </template>
 
 <script>
-import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // Waves directive
-import { parseTime } from '@/utils'
-import { request, post } from '@/utils/req.js'
-import { obj2formdatastr } from '@/utils/utils.js'
+import { request, put } from '@/utils/req.js'
+import { obj2formdatastr, maybe } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 const calendarTypeOptions = [
@@ -127,47 +154,17 @@ const calendarTypeOptions = [
   { key: '13', label: '临时标志中间处理数据' }
 ]
 
-const sortOptions = [
-  { key: 'city', label: '城市管理' },
-  { key: 'admn', label: '行政效能' },
-  { key: 'envr', label: '环境保护' },
-  { key: 'depa', label: '部门管理' },
-  { key: 'account', label: '账号管理' },
-  { key: 'street', label: '镇街管理' },
-  { key: 'service', label: '服务提供管控日志' },
-  { key: 'matter', label: '事项管理' },
-  { key: 'public', label: '舆情分析配置' }
-]
-
-// arr to obj ,such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
-
 export default {
   name: 'ComplexTable',
   components: { Pagination },
   directives: { waves },
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
-    }
-  },
   data() {
     return {
       tableKey: 0,
+      month: '',
       list: null,
       total: 0,
-      listLoading: true,
+      listLoading: false,
       listQuery: {
         id: '',
         page: 1,
@@ -178,42 +175,44 @@ export default {
         state: '',
         sort: '+id'
       },
+      // 状态切换
       calendarTypeOptions,
-      sortOptions,
-      statusOptions: ['published', 'draft', 'deleted'],
       temp: {
         id: undefined,
         importance: 1,
         remark: '',
-        timestamp: new Date(),
         title: '',
         type: '',
         status: 'published'
       },
       dialogFormVisible: false,
-      dialogStatus: '',
-      textMap: {
-        update: 'Edit',
-        create: 'Create'
+      props: {
+        value: 'label',
+        label: 'label',
+        children: 'children',
+        checkStrictly: true,
+        emitPath: false
       },
-      dialogPvVisible: false,
-      pvData: [],
-      rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
-      },
+      // 专题标签
+      matterItems:
+        maybe(
+          _ => JSON.parse(window.localStorage.getItem('themeMatterItems')),
+          []
+        ) || [],
       downloadLoading: false
     }
   },
   created() {
     this.getList()
+    this.changeTopics()
   },
   methods: {
     getList() {
       this.listLoading = true
+      if (!this.month) this.month = ''
+      if (!this.state) this.state = ''
       const params = obj2formdatastr({
-        month: '201812',
+        month: this.month,
         pageNumber: this.listQuery.page,
         pageSize: this.listQuery.limit,
         state: this.listQuery.state,
@@ -231,159 +230,100 @@ export default {
       })
     },
     indexMethod(index) {
-      return (index + 1) + 10 * (this.listQuery.page - 1)
+      return index + 1 + 10 * (this.listQuery.page - 1)
     },
+    // 获取专题标签
     changeTopics() {
-      // 路由跳转
-      this.$router.push({ path: '/' + this.listQuery.type + '/index' })
-    },
-    handleFilter() {
-      request('/sg/admn/' + this.listQuery.id).then(data => {
-        this.list = []
-        this.list.push(data)
-        this.listQuery.page = 1
-        this.total = 1
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 0.5 * 1000)
-      })
-    },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作成功',
-        type: 'success'
-      })
-      row.status = status
-    },
-    sortChange(data) {
-    //   const { prop, order } = data
-    //   if (prop === 'id') {
-    //     this.sortByID(order)
-    //   }
-    },
-    // sortByID(order) {
-    //   if (order === 'ascending') {
-    //     this.listQuery.sort = '+id'
-    //   } else {
-    //     this.listQuery.sort = '-id'
-    //   }
-    //   this.handleFilter()
-    // },
-    resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
+      if (!this.matterItems.length) {
+        request('/sg/base/sgSubjectItem/getAllSubjectItemList').then(result => {
+          // 数据清洗与初始化
+          this.matterItems = maybe(_ => result, []).map(data =>
+            Object.assign({}, data, { value: '__TOP__' + data.value })
+          )
+          // 插入缓存
+          window.localStorage.setItem(
+            'themeMatterItems',
+            JSON.stringify(this.matterItems)
+          )
+        })
       }
     },
-    handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
+    handleFilter() {
+      if (!this.listQuery.id) {
+        this.getList()
+      } else {
+        request('/sg/admn/' + this.listQuery.id).then(data => {
+          data ? this.list = data : this.list = []
+          this.listQuery.page = 1
+          this.total = 1
+          // Just to simulate the time of the request
+          setTimeout(() => {
+            this.listLoading = false
+          }, 0.5 * 1000)
+        })
+      }
     },
-    createData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
-    },
+    // 编辑
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
     },
     updateData() {
-      this.$refs['dataForm'].validate((valid) => {
+      this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
-            for (const v of this.list) {
-              if (v.id === this.temp.id) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
-                break
-              }
+          const params = obj2formdatastr({
+            orderId: this.temp.orderId,
+            state: this.temp.state,
+            subClazz: this.temp.subClazz,
+            subTags: this.temp.subTags
+          })
+          put('/sg/admn?' + params).then(data => {
+            if (data.code === 200) {
+              this.getList()
+              this.$message.success('修改成功！')
+              this.dialogFormVisible = false
             }
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
           })
         }
       })
     },
-    handleDelete(row) {
-      this.$notify({
-        title: '成功',
-        message: '删除成功',
-        type: 'success',
-        duration: 2000
-      })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
-    },
-    handleFetchPv(pv) {
-      fetchPv(pv).then(response => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
+    // 切换时间
+    changeDtae() {
+      this.getList()
     },
     handleDownload() {
-      this.downloadLoading = true
       const params = obj2formdatastr({
-        month: '201812',
+        month: this.month,
         pageNumber: this.listQuery.page,
         pageSize: this.listQuery.limit,
         state: this.listQuery.state,
         property: 'acceptTime',
         direction: 'DESC'
       })
-      request('/sg/admn/export?' + params).then(data => {
-        window.location.href = 'http://12345v1.dgdatav.com:6080/api/sg/admn/export?' + params
-        this.downloadLoading = false
-      })
-    },
-    formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
-        } else {
-          return v[j]
-        }
-      }))
+
+      const path = process.env.NODE_ENV === 'development' ? 'http://12345v2.alltosea.com:6080/' : '/'
+
+      window.open(path + 'api/sg/admn/export?' + params)
     }
   }
 }
 </script>
 <style lang="scss" scoped>
-.filter-container{
+.filter-container {
   display: flex;
   justify-content: space-between;
+}
+/deep/.el-textarea__inner {
+  height: 120px;
+}
+.content {
+  height: 150px;
+  overflow: auto;
+  padding: 0 10px;
+  background-color: beige;
 }
 </style>
 

@@ -87,7 +87,7 @@ export const constantRouterMap = [
   },
   // 环境保护
   {
-    path: '/guide',
+    path: '/envr',
     component: Layout,
     redirect: '/envr/index',
     children: [
@@ -96,6 +96,20 @@ export const constantRouterMap = [
         component: () => import('@/views/envr/index'),
         name: 'envr',
         meta: { title: 'envr', icon: 'guide', noCache: true }
+      }
+    ]
+  },
+  // 交通管理
+  {
+    path: '/traffic',
+    component: Layout,
+    redirect: '/traffic/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/traffic/index'),
+        name: 'traffic',
+        meta: { title: 'traffic', icon: 'guide', noCache: true }
       }
     ]
   },
@@ -138,20 +152,6 @@ export const constantRouterMap = [
         component: () => import('@/views/street/index'),
         name: 'street',
         meta: { title: 'street', icon: 'guide', noCache: true }
-      }
-    ]
-  },
-  // 服务提供管控日志
-  {
-    path: '/service',
-    component: Layout,
-    redirect: '/service/index',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/service/index'),
-        name: 'service',
-        meta: { title: 'service', icon: 'guide', noCache: true }
       }
     ]
   },
@@ -217,15 +217,21 @@ export const constantRouterMap = [
   },
   // 服务管控
   {
-    path: '/managerServer',
+    path: '/service',
     component: Layout,
-    redirect: '/managerServer/SgService',
+    redirect: '/service/index',
     alwaysShow: true, // will always show the root menu
     meta: {
       title: 'managerServer',
       icon: 'guide'
     },
     children: [
+      {
+        path: 'index',
+        component: () => import('@/views/service/index'),
+        name: 'service',
+        meta: { title: 'service' }
+      },
       {
         path: 'SgService',
         component: () => import('@/views/managerServer/SgService'),
@@ -255,20 +261,6 @@ export const constantRouterMap = [
         component: () => import('@/views/warning/index'),
         name: 'warning',
         meta: { title: 'warning', icon: 'guide', noCache: true }
-      }
-    ]
-  },
-  // 交通管理
-  {
-    path: '/traffic',
-    component: Layout,
-    redirect: '/traffic/index',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/traffic/index'),
-        name: 'traffic',
-        meta: { title: 'traffic', icon: 'guide', noCache: true }
       }
     ]
   }
