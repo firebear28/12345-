@@ -1,19 +1,14 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      ID查询：
-      <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      名称：
-      <el-select v-model="listQuery.state" placeholder="请选择名称" clearable class="filter-item" style="width: 130px" @change="getList">
-        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.label" :value="item.key"/>
-      </el-select>
-      当前专题：
-      <el-select v-model="listQuery.type" placeholder="请选择专题" clearable style="width: 140px" class="filter-item" @change="changeTopics">
-        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
-      </el-select>
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
-      <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button> -->
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
+      <div class="filter-items">
+        <span>登陆账号：</span>
+        <el-input v-model="listQuery.id" placeholder="请输入" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      </div>
+      <div class="filter-items">
+        <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
+        <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
+      </div>
     </div>
 
     <el-table
@@ -25,17 +20,13 @@
       style="width: 100%;"
       @sort-change="sortChange">
       <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
-      <el-table-column label="登陆账号" prop="account" min-width="200"/>
-      <el-table-column label="登陆渠道" prop="fromChannel" width="150"/>
-      <el-table-column label="来源推广渠道" prop="advertChannel" width="150"/>
-      <el-table-column label="调用标识" prop="requestIden" width="150"/>
-      <el-table-column label="请求时间" prop="requestTime" width="150"/>
-      <el-table-column label="响应时间" prop="responseTime" width="150"/>
-      <el-table-column label="响应编码" prop="responseCode" width="150"/>
-      <el-table-column label="响应消息" prop="responseMessage" width="150"/>
-      <el-table-column label="调用方IP" prop="clientIp" width="150"/>
-      <el-table-column label="服务器IP" prop="requestParams" width="150"/>
-      <el-table-column label="调用参数" prop="responseData" width="150"/>
+      <el-table-column label="登陆账号" prop="account" width="100"/>
+      <el-table-column label="调用方IP" prop="clientIp" width="130"/>
+      <el-table-column label="调用标识" prop="requestIden" min-width="200"/>
+      <el-table-column label="请求时间" prop="requestTime" width="160"/>
+      <el-table-column label="响应时间" prop="responseTime" width="160"/>
+      <el-table-column label="响应编码" prop="responseCode" align="center" width="100"/>
+      <el-table-column label="调用参数" prop="requestParams" min-width="300"/>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
@@ -113,7 +104,7 @@ const sortOptions = [
   { key: 'depa', label: '部门管理' },
   { key: 'account', label: '账号管理' },
   { key: 'street', label: '镇街管理' },
-  { key: 'service', label: '服务提供管控日志' },
+  { key: 'service', label: '集中日志管理' },
   { key: 'matter', label: '事项管理' },
   { key: 'public', label: '舆情分析配置' }
 ]
@@ -357,8 +348,18 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.filter-item{
-  margin-right: 20px;
-}
+  .filter-container{
+    display: flex;
+    justify-content: flex-start;
+    .filter-items {
+      display: flex;
+      justify-content: flex-start;
+      align-items: baseline;
+      margin-right: 20px;
+      span {
+        white-space: nowrap;
+      }
+    }
+  }
 </style>
 

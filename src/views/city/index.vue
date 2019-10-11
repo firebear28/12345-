@@ -92,13 +92,13 @@
         ref="dataForm"
         :model="temp"
         label-width="140px"
-        style="width: 500px; margin-left:50px;"
+        style="width: 100%; padding-left:50px; padding-right:50px;"
       >
         <el-form-item label="标题：" prop="title">
-          <span>{{temp.title}}</span>
+          <span>{{ temp.title }}</span>
         </el-form-item>
         <el-form-item label="状态：" prop="state">
-          <el-select v-model="temp.state" placeholder="请选择状态" clearable>
+          <el-select v-model="temp.state" placeholder="请选择状态" clearable style="width:80%">
             <el-option
               v-for="item in calendarTypeOptions"
               :key="item.key"
@@ -108,7 +108,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="专题分类：" prop="subClazz">
-          <el-input v-model="temp.subClazz" style="width:200px"/>
+          <el-input v-model="temp.subClazz" style="width:80%"/>
         </el-form-item>
         <el-form-item label="专题标签：" prop="subTags">
           <!-- <el-input v-model="temp.subTags" /> -->
@@ -121,16 +121,17 @@
             placeholder="请选择"
             filterable
             clearable
+            style="width:80%"
           />
         </el-form-item>
         <el-form-item label="专题分类的准确率：" prop="subClazzProba">
-          <span>{{temp.subClazzProba}}</span>
+          <span>{{ temp.subClazzProba }}</span>
         </el-form-item>
         <el-form-item label="专题标签的准确率：" prop="subTagsProba">
-          <span>{{temp.subTagsProba}}</span>
+          <span>{{ temp.subTagsProba }}</span>
         </el-form-item>
         <el-form-item label="投诉内容：" prop="content">
-          <div class="content">{{temp.content}}</div>
+          <div class="content">{{ temp.content }}</div>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -142,73 +143,73 @@
 </template>
 
 <script>
-import waves from "@/directive/waves" // Waves directive
-import { request, put } from "@/utils/req.js"
-import { obj2formdatastr, maybe } from "@/utils/utils.js"
-import Pagination from "@/components/Pagination" // Secondary package based on el-pagination
+import waves from '@/directive/waves' // Waves directive
+import { request, put } from '@/utils/req.js'
+import { obj2formdatastr, maybe } from '@/utils/utils.js'
+import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 const calendarTypeOptions = [
-  { key: "10", label: "可用初始训练数据" },
-  { key: "11", label: "人工校准" },
-  { key: "12", label: "识率很高数据" },
-  { key: "13", label: "临时标志中间处理数据" }
-];
+  { key: '10', label: '可用初始训练数据' },
+  { key: '11', label: '人工校准' },
+  { key: '12', label: '识率很高数据' },
+  { key: '13', label: '临时标志中间处理数据' }
+]
 
 export default {
-  name: "ComplexTable",
+  name: 'ComplexTable',
   components: { Pagination },
   directives: { waves },
   data() {
     return {
       tableKey: 0,
-      month: "",
+      month: '',
       list: null,
       total: 0,
       listLoading: false,
       listQuery: {
-        id: "",
+        id: '',
         page: 1,
         limit: 10,
         importance: undefined,
         title: undefined,
         type: undefined,
-        state: "",
-        sort: "+id"
+        state: '',
+        sort: '+id'
       },
       // 状态切换
       calendarTypeOptions,
       temp: {
         id: undefined,
         importance: 1,
-        remark: "",
-        title: "",
-        type: "",
-        status: "published"
+        remark: '',
+        title: '',
+        type: '',
+        status: 'published'
       },
       dialogFormVisible: false,
       props: {
-        value: "label",
-        label: "label",
-        children: "children",
+        value: 'label',
+        label: 'label',
+        children: 'children',
         checkStrictly: true,
         emitPath: false
       },
       // 专题标签
       matterItems:
         maybe(
-          _ => JSON.parse(window.localStorage.getItem("themeMatterItems")),
+          _ => JSON.parse(window.localStorage.getItem('themeMatterItems')),
           []
         ) || [],
       downloadLoading: false
-    };
+    }
   },
   created() {
-    this.getList();
-    this.changeTopics();
+    this.getList()
+    this.changeTopics()
   },
   methods: {
     getList() {
-      this.listLoading = true;
+      this.listLoading = true
       if (!this.month) this.month = ''
       if (!this.state) this.state = ''
       const params = obj2formdatastr({
@@ -216,83 +217,83 @@ export default {
         pageNumber: this.listQuery.page,
         pageSize: this.listQuery.limit,
         state: this.listQuery.state,
-        property: "acceptTime",
-        direction: "DESC"
-      });
-      request("/sg/citymanagement/findByPage?" + params).then(data => {
-        this.list = data.content;
-        this.total = data.totalElements;
+        property: 'acceptTime',
+        direction: 'DESC'
+      })
+      request('/sg/citymanagement/findByPage?' + params).then(data => {
+        this.list = data.content
+        this.total = data.totalElements
 
         // Just to simulate the time of the request
         setTimeout(() => {
-          this.listLoading = false;
-        }, 0.5 * 1000);
-      });
+          this.listLoading = false
+        }, 0.5 * 1000)
+      })
     },
     indexMethod(index) {
-      return index + 1 + 10 * (this.listQuery.page - 1);
+      return index + 1 + 10 * (this.listQuery.page - 1)
     },
     // 获取专题标签
     changeTopics() {
       if (!this.matterItems.length) {
-        request("/sg/base/sgSubjectItem/getAllSubjectItemList").then(result => {
+        request('/sg/base/sgSubjectItem/getAllSubjectItemList').then(result => {
           // 数据清洗与初始化
           this.matterItems = maybe(_ => result, []).map(data =>
-            Object.assign({}, data, { value: "__TOP__" + data.value })
-          );
+            Object.assign({}, data, { value: '__TOP__' + data.value })
+          )
           // 插入缓存
           window.localStorage.setItem(
-            "themeMatterItems",
+            'themeMatterItems',
             JSON.stringify(this.matterItems)
-          );
-        });
+          )
+        })
       }
     },
     handleFilter() {
-      if(!this.listQuery.id){
+      if (!this.listQuery.id) {
         this.getList()
-      }else{
-        request("/sg/citymanagement/" + this.listQuery.id).then(data => {
+      } else {
+        request('/sg/citymanagement/' + this.listQuery.id).then(data => {
           data ? this.list = data : this.list = []
-          this.listQuery.page = 1;
-          this.total = 1;
+          this.listQuery.page = 1
+          this.total = 1
           // Just to simulate the time of the request
           setTimeout(() => {
-            this.listLoading = false;
-          }, 0.5 * 1000);
-        });
+            this.listLoading = false
+          }, 0.5 * 1000)
+        })
       }
     },
     // 编辑
     handleUpdate(row) {
-      this.temp = Object.assign({}, row); // copy obj
-      this.dialogFormVisible = true;
+      this.temp = Object.assign({}, row) // copy obj
+      this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+        this.$refs['dataForm'].clearValidate()
+      })
     },
     updateData() {
-      this.$refs["dataForm"].validate(valid => {
+      this.$refs['dataForm'].validate(valid => {
         if (valid) {
           const params = obj2formdatastr({
             orderId: this.temp.orderId,
             state: this.temp.state,
             subClazz: this.temp.subClazz,
             subTags: this.temp.subTags
-          });
-          put("/sg/citymanagement?"+params).then(data => {
-            if(data.code === 200){
+          })
+          put('/sg/citymanagement?' + params).then(data => {
+            if (data.code === 200) {
               this.getList()
               this.$message.success('修改成功！')
-              this.dialogFormVisible = false;
+              this.dialogFormVisible = false
             }
           })
         }
-      });
+      })
     },
     // 切换时间
     changeDtae() {
-      this.getList();
+      this.getList()
     },
     handleDownload() {
       const params = obj2formdatastr({
@@ -300,16 +301,16 @@ export default {
         pageNumber: this.listQuery.page,
         pageSize: this.listQuery.limit,
         state: this.listQuery.state,
-        property: "acceptTime",
-        direction: "DESC"
-      });
+        property: 'acceptTime',
+        direction: 'DESC'
+      })
 
-      const path = process.env.NODE_ENV === 'development' ?  'http://12345v2.alltosea.com:6080/' : '/'
+      const path = process.env.NODE_ENV === 'development' ? 'http://12345v2.alltosea.com:6080/' : '/'
 
-      window.open(path +'api/sg/citymanagement/export?' + params)
+      window.open(path + 'api/sg/citymanagement/export?' + params)
     }
   }
-};
+}
 </script>
 <style lang="scss" scoped>
 .filter-container {

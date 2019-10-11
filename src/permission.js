@@ -11,7 +11,7 @@ router.beforeEach((to, from, next) => {
   NProgress.start()
   if (to.path === '/login') {
     next()
-    NProgress.done() 
+    NProgress.done()
   } else if (getToken()) { // determine if there has token
     store.dispatch('GenerateRoutes', { roles: store.getters.roles }).then(() => { // 根据roles权限生成可访问的路由表
       router.addRoutes(store.getters.addRouters) // 动态添加可访问路由表
@@ -19,10 +19,8 @@ router.beforeEach((to, from, next) => {
       store.dispatch('GetUserInfo').then(_ => {
         next()
       })
-
     })
   } else {
-    Message('请登陆！')
     next(`/login?redirect=${to.path}`) // 否则全部重定向到登录页
     NProgress.done()
   }

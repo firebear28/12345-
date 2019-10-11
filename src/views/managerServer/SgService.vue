@@ -1,19 +1,19 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      ID查询：
-      <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      名称：
-      <el-select v-model="listQuery.state" placeholder="请选择名称" clearable class="filter-item" style="width: 130px" @change="getList">
-        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.label" :value="item.key"/>
-      </el-select>
-      当前专题：
-      <el-select v-model="listQuery.type" placeholder="请选择专题" clearable style="width: 140px" class="filter-item" @change="changeTopics">
-        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
-      </el-select>
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
+      <div class="filter-items">
+        <span>服务名称：</span>
+        <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      </div>
+      <div class="filter-items">
+        <span>模块：</span>
+        <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      </div>
+      <div class="filter-items">
+        <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
+        <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button>
+        <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
+      </div>
     </div>
 
     <el-table
@@ -25,9 +25,12 @@
       style="width: 100%;"
       @sort-change="sortChange">
       <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
-      <el-table-column label="主键" prop="bid" min-width="200"/>
-      <el-table-column label="网站地址" prop="address" width="300"/>
-      <el-table-column label="网站名称" prop="webName" width="300"/>
+      <el-table-column label="服务名称" prop="serviceName" width="200"/>
+      <el-table-column label="模块" prop="module" width="100"/>
+      <el-table-column label="请求路径" prop="serviceUrl" min-width="200"/>
+      <el-table-column label="请求方法" prop="method" align="center" width="100"/>
+      <el-table-column label="入参" prop="accessParams" width="250"/>
+      <el-table-column label="返参" prop="returnParams" width="250"/>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
@@ -91,7 +94,7 @@ const sortOptions = [
   { key: 'depa', label: '部门管理' },
   { key: 'account', label: '账号管理' },
   { key: 'street', label: '镇街管理' },
-  { key: 'service', label: '服务提供管控日志' },
+  { key: 'service', label: '集中日志管理' },
   { key: 'matter', label: '事项管理' },
   { key: 'public', label: '舆情分析配置' }
 ]
@@ -169,7 +172,7 @@ export default {
         page: this.listQuery.page,
         size: this.listQuery.limit
       })
-      request('/sg/base/sgService/queryByPage?' + params).then(data => {
+      request('sg/base/sgService/queryByPage?' + params).then(data => {
         this.list = data.content
         this.total = data.totalElements
 
@@ -324,8 +327,18 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.filter-item{
-  margin-right: 20px;
-}
+  .filter-container{
+    display: flex;
+    justify-content: flex-start;
+    .filter-items {
+      display: flex;
+      justify-content: flex-start;
+      align-items: baseline;
+      margin-right: 20px;
+      span {
+        white-space: nowrap;
+      }
+    }
+  }
 </style>
 

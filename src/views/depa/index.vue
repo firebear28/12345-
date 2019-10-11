@@ -1,23 +1,21 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <div>
-        ID查询：
-        <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <div class="filter-items">
+        <span>主部门：</span>
+        <el-input v-model="listQuery.like_departName" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
       </div>
-      <div>
-        名称：
-        <el-select v-model="listQuery.state" placeholder="请选择名称" clearable class="filter-item" style="width: 130px" @change="getList">
-          <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.label" :value="item.key"/>
-        </el-select>
+      <div class="filter-items">
+        <span>子部门：</span>
+        <el-input v-model="listQuery.like_subDepartName" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
       </div>
-      <div>
-        当前专题：
-        <el-select v-model="listQuery.type" placeholder="请选择专题" clearable style="width: 140px" class="filter-item" @change="changeTopics">
+      <div class="filter-items">
+        <span>子系统：</span>
+        <el-select v-model="listQuery.eq_subId" placeholder="请选择" clearable style="width: 100%" class="filter-item" @change="changeTopics">
           <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
         </el-select>
       </div>
-      <div>
+      <div class="filter-items">
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
         <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">添加</el-button>
         <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
@@ -30,19 +28,18 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;"
-      @sort-change="sortChange">
+      style="width: 100%;">
       <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
-      <el-table-column label="部门ID" prop="departId" width="100"/>
-      <el-table-column label="部门名称" prop="departName" min-width="150"/>
-      <el-table-column label="备注" prop="remark" width="150"/>
-      <el-table-column label="上级部门ID" prop="rootDepartId" align="center" width="135"/>
-      <el-table-column label="上级部门名称" prop="rootDepartName" align="center" width="135"/>
-      <el-table-column label="子系统部门ID" prop="subDepartId" align="center" width="135"/>
-      <el-table-column label="子系统部门名称" prop="subDepartName" align="center" width="135"/>
-      <el-table-column label="子系统ID（HL|ZW）" prop="subId" align="center" width="150"/>
-      <el-table-column label="子系统上级部门ID" prop="subRootDepartId" align="center" width="135"/>
-      <el-table-column label="子系统上级部门名称" prop="subRootDepartName" align="center" width="150"/>
+      <!-- <el-table-column label="部门ID" prop="departId" width="100"/> -->
+      <el-table-column label="主部门" prop="departName" min-width="200"/>
+      <!-- <el-table-column label="备注" prop="remark" width="150"/> -->
+      <!-- <el-table-column label="上级部门ID" prop="rootDepartId" align="center" width="135"/> -->
+      <el-table-column label="上级部门" prop="rootDepartName" align="center" min-width="135"/>
+      <!-- <el-table-column label="子系统部门ID" prop="subDepartId" align="center" width="135"/> -->
+      <el-table-column label="子系统部门" prop="subDepartName" min-width="200"/>
+      <!-- <el-table-column label="子系统ID（HL|ZW）" prop="subId" align="center" width="150"/> -->
+      <!-- <el-table-column label="子系统上级部门ID" prop="subRootDepartId" align="center" width="135"/> -->
+      <el-table-column label="子系统上级部门" prop="subRootDepartName" align="center" min-width="150"/>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
@@ -127,15 +124,15 @@ const calendarTypeOptions = [
 ]
 
 const sortOptions = [
-  { key: 'city', label: '城市管理' },
-  { key: 'admn', label: '行政效能' },
-  { key: 'envr', label: '环境保护' },
-  { key: 'depa', label: '部门管理' },
-  { key: 'account', label: '账号管理' },
-  { key: 'street', label: '镇街管理' },
-  { key: 'service', label: '服务提供管控日志' },
-  { key: 'matter', label: '事项管理' },
-  { key: 'public', label: '舆情分析配置' }
+  { key: 'HL', label: '热线' },
+  { key: 'ZW', label: '智网' }
+  // { key: 'envr', label: '环境保护' },
+  // { key: 'depa', label: '部门管理' },
+  // { key: 'account', label: '账号管理' },
+  // { key: 'street', label: '镇街管理' },
+  // { key: 'service', label: '集中日志管理' },
+  // { key: 'matter', label: '事项管理' },
+  // { key: 'public', label: '舆情分析配置' }
 ]
 
 // arr to obj ,such as { CN : "China", US : "USA" }
@@ -168,14 +165,11 @@ export default {
       total: 0,
       listLoading: true,
       listQuery: {
-        id: '',
+        like_departName: '',
+        like_subDepartName: '',
+        eq_subId: '',
         page: 1,
-        limit: 10,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
-        state: '',
-        sort: '+id'
+        limit: 10
       },
       calendarTypeOptions,
       sortOptions,
@@ -366,9 +360,19 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.filter-container{
-  display: flex;
-  justify-content: space-between;
-}
+  .filter-container{
+    display: flex;
+    justify-content: space-between;
+    .filter-items {
+      display: flex;
+      justify-content: flex-start;
+      align-items: baseline;
+      width: 25%;
+      margin: 0 10px;
+      span {
+        white-space: nowrap;
+      }
+    }
+  }
 </style>
 

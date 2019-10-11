@@ -1,25 +1,16 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <div>
-        ID查询：
-        <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <div class="filter-items">
+        <span>镇街编码：</span>
+        <el-input v-model="listQuery.id" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
       </div>
-      <div>
-        名称：
-        <el-select v-model="listQuery.state" placeholder="请选择名称" clearable class="filter-item" style="width: 130px" @change="getList">
-          <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.label" :value="item.key"/>
-        </el-select>
+      <div class="filter-items">
+        <span>镇街名称：</span>
+        <el-input v-model="listQuery.id" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
       </div>
-      <div>
-        当前专题：
-        <el-select v-model="listQuery.type" placeholder="请选择专题" clearable style="width: 140px" class="filter-item" @change="changeTopics">
-          <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
-        </el-select>
-      </div>
-      <div>
+      <div class="filter-items">
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
-        <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button> -->
         <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
       </div>
     </div>
@@ -33,9 +24,9 @@
       style="width: 100%;"
       @sort-change="sortChange">
       <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
-      <el-table-column label="镇街ID" prop="streetId" min-width="200"/>
-      <el-table-column label="镇街名称" prop="streetName" width="150"/>
-      <el-table-column label="镇街所在地" prop="streetPid" width="150"/>
+      <el-table-column label="镇街编码" prop="streetId" min-width="200"/>
+      <el-table-column label="镇街名称" prop="streetName" min-width="200"/>
+      <!-- <el-table-column label="镇街所在地" prop="streetPid" width="150"/> -->
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
@@ -113,7 +104,7 @@ const sortOptions = [
   { key: 'depa', label: '部门管理' },
   { key: 'account', label: '账号管理' },
   { key: 'street', label: '镇街管理' },
-  { key: 'service', label: '服务提供管控日志' },
+  { key: 'service', label: '集中日志管理' },
   { key: 'matter', label: '事项管理' },
   { key: 'public', label: '舆情分析配置' }
 ]
@@ -355,9 +346,19 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.filter-container{
-  display: flex;
-  justify-content: space-between;
-}
+  .filter-container{
+    display: flex;
+    justify-content: space-between;
+    .filter-items {
+      display: flex;
+      justify-content: flex-start;
+      align-items: baseline;
+      width: 33%;
+      margin: 0 10px;
+      span {
+        white-space: nowrap;
+      }
+    }
+  }
 </style>
 

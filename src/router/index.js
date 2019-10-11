@@ -250,7 +250,7 @@ export const constantRouterMap = [
       }
     ]
   },
-  // 预警阀值
+  // 预警阀值管理
   {
     path: '/warning',
     component: Layout,

@@ -92,7 +92,7 @@ const sortOptions = [
   { key: 'depa', label: '部门管理' },
   { key: 'account', label: '账号管理' },
   { key: 'street', label: '镇街管理' },
-  { key: 'service', label: '服务提供管控日志' },
+  { key: 'service', label: '集中日志管理' },
   { key: 'matter', label: '事项管理' },
   { key: 'public', label: '舆情分析配置' }
 ]

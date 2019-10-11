@@ -1,19 +1,19 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      ID查询：
-      <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      名称：
-      <el-select v-model="listQuery.state" placeholder="请选择名称" clearable class="filter-item" style="width: 130px" @change="getList">
-        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.label" :value="item.key"/>
-      </el-select>
-      当前专题：
-      <el-select v-model="listQuery.type" placeholder="请选择专题" clearable style="width: 140px" class="filter-item" @change="changeTopics">
-        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
-      </el-select>
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
+      <div class="filter-items">
+        <span>服务名称：</span>
+        <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      </div>
+      <div class="filter-items">
+        <span>模块：</span>
+        <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      </div>
+      <div class="filter-items">
+        <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
+        <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button>
+        <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
+      </div>
     </div>
 
     <el-table
@@ -25,9 +25,9 @@
       style="width: 100%;"
       @sort-change="sortChange">
       <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
-      <el-table-column label="主键" prop="bid" min-width="200"/>
-      <el-table-column label="关键字" prop="keyword" width="300"/>
-      <el-table-column label="关键字类别" prop="type" width="300"/>
+      <el-table-column label="服务名称" prop="serviceName" min-width="200"/>
+      <el-table-column label="账号" prop="userAccount" min-width="200"/>
+      <el-table-column label="账号名称" prop="userFullname" min-width="200"/>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
@@ -44,11 +44,11 @@
         <el-form-item label="主键" prop="bid">
           <el-input v-model="temp.bid"/>
         </el-form-item>
-        <el-form-item label="关键字" prop="keyword">
-          <el-input v-model="temp.keyword"/>
+        <el-form-item label="网站地址" prop="address">
+          <el-input v-model="temp.address"/>
         </el-form-item>
-        <el-form-item label="关键字类别" prop="type">
-          <el-input v-model="temp.type"/>
+        <el-form-item label="网站名称" prop="webName">
+          <el-input v-model="temp.webName"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -71,7 +71,6 @@
 </template>
 
 <script>
-import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // Waves directive
 import { parseTime } from '@/utils'
 import { request, post, put, reqDelete } from '@/utils/req.js'
@@ -92,7 +91,7 @@ const sortOptions = [
   { key: 'depa', label: '部门管理' },
   { key: 'account', label: '账号管理' },
   { key: 'street', label: '镇街管理' },
-  { key: 'service', label: '服务提供管控日志' },
+  { key: 'service', label: '集中日志管理' },
   { key: 'matter', label: '事项管理' },
   { key: 'public', label: '舆情分析配置' }
 ]
@@ -154,8 +153,8 @@ export default {
       pvData: [],
       rules: {
         bid: [{ required: true, message: 'type is required', trigger: 'change' }],
-        keyword: [{ required: true, message: 'type is required', trigger: 'change' }],
-        type: [{ required: true, message: 'type is required', trigger: 'change' }]
+        address: [{ required: true, message: 'type is required', trigger: 'change' }],
+        webName: [{ required: true, message: 'type is required', trigger: 'change' }]
       },
       downloadLoading: false
     }
@@ -170,7 +169,7 @@ export default {
         page: this.listQuery.page,
         size: this.listQuery.limit
       })
-      request('/sg/base/sgServiceUser/queryByPage?' + params).then(data => {
+      request('sg/base/sgServiceUser/queryByPage?' + params).then(data => {
         this.list = data.content
         this.total = data.totalElements
 
@@ -188,8 +187,8 @@ export default {
       this.$router.push({ path: '/' + this.listQuery.type + '/index' })
     },
     handleFilter() {
-      request('/sg/item/sgSentimentKeyword/' + this.listQuery.id).then(data => {
-        if (data.length != 0) {
+      request('/sg/item/sgSentimentAddress/' + this.listQuery.id).then(data => {
+        if (data.length !== 0) {
           this.list = []
           this.list.push(data)
           this.listQuery.page = 1
@@ -206,7 +205,7 @@ export default {
       })
     },
     handleModifyStatus(row, status) {
-      reqDelete('/sg/item/sgSentimentKeyword/' + row.bid).then(data => {
+      reqDelete('/sg/item/sgSentimentAddress/' + row.bid).then(data => {
         this.$notify({
           title: '成功',
           message: '删除成功',
@@ -235,8 +234,8 @@ export default {
     resetTemp() {
       this.temp = {
         bid: '',
-        keyword: '',
-        type: ''
+        address: '',
+        webName: ''
       }
     },
     handleCreate() {
@@ -251,7 +250,7 @@ export default {
       const params = obj2formdatastr(this.temp)
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          post('/sg/item/sgSentimentKeyword/add?' + params).then(data => {
+          post('/sg/item/sgSentimentAddress/add?' + params).then(data => {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.$notify({
@@ -276,7 +275,7 @@ export default {
       const params = obj2formdatastr(this.temp)
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          put('/sg/item/sgSentimentKeyword/update?' + params).then(data => {
+          put('/sg/item/sgSentimentAddress/update?' + params).then(data => {
             this.dialogFormVisible = false
             this.$notify({
               title: '成功',
@@ -290,7 +289,7 @@ export default {
       })
     },
     handleDelete(row) {
-      request('/sg/item/sgSentimentKeyword/' + row.bid).then(data => {
+      request('/sg/item/sgSentimentAddress/' + row.bid).then(data => {
         this.$notify({
           title: '成功',
           message: '删除成功',
@@ -301,20 +300,14 @@ export default {
         this.list.splice(index, 1)
       })
     },
-    handleFetchPv(pv) {
-      fetchPv(pv).then(response => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
-    },
     handleDownload() {
       this.downloadLoading = true
       const params = obj2formdatastr({
         page: this.listQuery.page,
         size: this.listQuery.limit
       })
-      window.location.href = 'http://12345v1.dgdatav.com:6080/api/sg/item/sgSentimentKeyword/export?' + params
-      request('/sg/item/sgSentimentKeyword/export?' + params).then(data => {
+      window.location.href = 'http://12345v1.dgdatav.com:6080/api/sg/item/sgSentimentAddress/export?' + params
+      request('/sg/item/sgSentimentAddress/export?' + params).then(data => {
         this.downloadLoading = false
       })
     },
@@ -331,8 +324,18 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.filter-item{
-  margin-right: 20px;
-}
+  .filter-container{
+    display: flex;
+    justify-content: flex-start;
+    .filter-items {
+      display: flex;
+      justify-content: flex-start;
+      align-items: baseline;
+      margin-right: 20px;
+      span {
+        white-space: nowrap;
+      }
+    }
+  }
 </style>
 

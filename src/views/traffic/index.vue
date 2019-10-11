@@ -92,13 +92,13 @@
         ref="dataForm"
         :model="temp"
         label-width="140px"
-        style="width: 500px; margin-left:50px;"
+        style="width: 100%; padding-left:50px; padding-right:50px;"
       >
         <el-form-item label="标题：" prop="title">
           <span>{{ temp.title }}</span>
         </el-form-item>
         <el-form-item label="状态：" prop="state">
-          <el-select v-model="temp.state" placeholder="请选择状态" clearable>
+          <el-select v-model="temp.state" placeholder="请选择状态" clearable style="width:80%">
             <el-option
               v-for="item in calendarTypeOptions"
               :key="item.key"
@@ -108,7 +108,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="专题分类：" prop="subClazz">
-          <el-input v-model="temp.subClazz" style="width:200px"/>
+          <el-input v-model="temp.subClazz" style="width:80%"/>
         </el-form-item>
         <el-form-item label="专题标签：" prop="subTags">
           <!-- <el-input v-model="temp.subTags" /> -->
@@ -121,6 +121,7 @@
             placeholder="请选择"
             filterable
             clearable
+            style="width:80%"
           />
         </el-form-item>
         <el-form-item label="专题分类的准确率：" prop="subClazzProba">
