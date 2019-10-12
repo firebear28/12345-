@@ -30,15 +30,9 @@
       highlight-current-row
       style="width: 100%;">
       <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
-      <!-- <el-table-column label="部门ID" prop="departId" width="100"/> -->
       <el-table-column label="主部门" prop="departName" min-width="200"/>
-      <!-- <el-table-column label="备注" prop="remark" width="150"/> -->
-      <!-- <el-table-column label="上级部门ID" prop="rootDepartId" align="center" width="135"/> -->
       <el-table-column label="上级部门" prop="rootDepartName" align="center" min-width="135"/>
-      <!-- <el-table-column label="子系统部门ID" prop="subDepartId" align="center" width="135"/> -->
       <el-table-column label="子系统部门" prop="subDepartName" min-width="200"/>
-      <!-- <el-table-column label="子系统ID（HL|ZW）" prop="subId" align="center" width="150"/> -->
-      <!-- <el-table-column label="子系统上级部门ID" prop="subRootDepartId" align="center" width="135"/> -->
       <el-table-column label="子系统上级部门" prop="subRootDepartName" align="center" min-width="150"/>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -52,42 +46,19 @@
     <pagination :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="140px" style="width: 500px; margin-left:50px;">
-        <el-form-item label="部门ID" prop="departId">
-          <el-input v-model="temp.departId"/>
-        </el-form-item>
-        <el-form-item label="部门名称" prop="departName">
+      <el-form ref="dataForm" class="dataForm" :rules="rules" :model="temp" label-position="left" label-width="140px">
+        <el-form-item label="主部门" prop="departName">
           <el-input v-model="temp.departName"/>
         </el-form-item>
-        <el-form-item label="上级部门ID" prop="rootDepartId">
-          <el-input v-model="temp.rootDepartId"/>
+        <el-form-item label="智网部门" prop="rootDepartId">
+          <el-select v-model="listQuery.eq_subId" placeholder="请选择" clearable style="width: 100%" class="filter-item" @change="changeTopics">
+            <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
+          </el-select>
         </el-form-item>
-        <el-form-item label="上级部门名称" prop="rootDepartName">
-          <el-input v-model="temp.rootDepartName"/>
-        </el-form-item>
-        <el-form-item label="子系统部门ID" prop="subDepartId">
-          <el-input v-model="temp.subDepartId"/>
-        </el-form-item>
-        <el-form-item label="子系统部门等级" prop="subDepartLevel">
-          <el-input v-model="temp.subDepartLevel"/>
-        </el-form-item>
-        <el-form-item label="子系统部门名称" prop="subDepartName">
-          <el-input v-model="temp.subDepartName"/>
-        </el-form-item>
-        <el-form-item label="子系统ID（HL|ZW）" prop="subId">
-          <el-input v-model="temp.subId"/>
-        </el-form-item>
-        <el-form-item label="子系统上级部门ID" prop="subRootDepartId">
-          <el-input v-model="temp.subRootDepartId"/>
-        </el-form-item>
-        <el-form-item label="子系统上级部门名称" prop="subRootDepartName">
-          <el-input v-model="temp.subRootDepartName"/>
-        </el-form-item>
-        <el-form-item label="子系统部门父类型" prop="subRootDepartType">
-          <el-input v-model="temp.subRootDepartType"/>
-        </el-form-item>
-        <el-form-item label="备注">
-          <el-input :autosize="{ minRows: 2, maxRows: 4}" v-model="temp.remark" type="textarea" placeholder="Please input"/>
+        <el-form-item label="热线部门" prop="rootDepartName">
+          <el-select v-model="listQuery.eq_subId" placeholder="请选择" clearable style="width: 100%" class="filter-item" @change="changeTopics">
+            <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -116,48 +87,16 @@ import { request, post } from '@/utils/req.js'
 import { obj2formdatastr } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
-const calendarTypeOptions = [
-  { key: '10', label: '可用初始训练数据' },
-  { key: '11', label: '人工校准' },
-  { key: '12', label: '识率很高数据' },
-  { key: '13', label: '临时标志中间处理数据' }
-]
 
 const sortOptions = [
   { key: 'HL', label: '热线' },
   { key: 'ZW', label: '智网' }
-  // { key: 'envr', label: '环境保护' },
-  // { key: 'depa', label: '部门管理' },
-  // { key: 'account', label: '账号管理' },
-  // { key: 'street', label: '镇街管理' },
-  // { key: 'service', label: '集中日志管理' },
-  // { key: 'matter', label: '事项管理' },
-  // { key: 'public', label: '舆情分析配置' }
 ]
-
-// arr to obj ,such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
 
 export default {
   name: 'ComplexTable',
   components: { Pagination },
   directives: { waves },
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
-    }
-  },
   data() {
     return {
       tableKey: 0,
@@ -171,7 +110,6 @@ export default {
         page: 1,
         limit: 10
       },
-      calendarTypeOptions,
       sortOptions,
       statusOptions: ['published', 'draft', 'deleted'],
       temp: {
@@ -300,6 +238,9 @@ export default {
       this.temp.isNew = false
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
+      request('/sg/department/sgMainDepartment/' + row.id).then(request => {
+        this.temp = request.data
+      })
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
@@ -373,6 +314,10 @@ export default {
         white-space: nowrap;
       }
     }
+  }
+  .dataForm {
+    width: 100%;
+    padding: 50px;
   }
 </style>
 
