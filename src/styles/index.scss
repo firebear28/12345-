@@ -183,12 +183,29 @@ code {
 
 .filter-container {
   padding-bottom: 10px;
+  display: flex;
+  justify-content: flex-start;
 
+  .filter-items {
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+    width: 20%;
+    margin: 0 10px;
+    span {
+      white-space: nowrap;
+    }
+  }
   .filter-item {
     display: inline-block;
     vertical-align: middle;
     margin-bottom: 10px;
   }
+}
+
+.dataForm {
+  width: 100%;
+  padding: 50px;
 }
 
 //refine vue-multiselect plugin

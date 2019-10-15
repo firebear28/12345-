@@ -1,53 +1,16 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <div>
-        ID查询：
+      <div class="filter-items">
+        <span>ID查询：</span>
         <el-input
           v-model="listQuery.id"
           placeholder="请输入订单编号"
-          style="width: 200px;"
           class="filter-item"
           @keyup.enter.native="handleFilter"
         />
       </div>
-      <!-- <div>
-        名称：
-        <el-select
-          v-model="listQuery.state"
-          placeholder="请选择名称"
-          clearable
-          class="filter-item"
-          style="width: 130px"
-          @change="getList"
-        >
-          <el-option
-            v-for="item in calendarTypeOptions"
-            :key="item.key"
-            :label="item.label"
-            :value="item.key"
-          />
-        </el-select>
-      </div>
-      <div>
-        当前专题：
-        <el-select
-          v-model="listQuery.type"
-          placeholder="请选择专题"
-          clearable
-          style="width: 140px"
-          class="filter-item"
-          @change="changeTopics"
-        >
-          <el-option
-            v-for="item in sortOptions"
-            :key="item.key"
-            :label="item.label"
-            :value="item.key"
-          />
-        </el-select>
-      </div>-->
-      <div>
+      <div class="filter-items">
         <el-button
           v-waves
           class="filter-item"
@@ -110,14 +73,7 @@
     />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form
-        ref="dataForm"
-        :rules="rules"
-        :model="temp"
-        label-position="left"
-        label-width="70px"
-        style="width: 400px; margin-left:50px;"
-      >
+      <el-form ref="dataForm" class="dataForm" :rules="rules" :model="temp" label-position="left" label-width="140px">
         <el-form-item label="名称" prop="fullname">
           <el-input v-model="temp.fullname" />
         </el-form-item>
@@ -192,25 +148,6 @@ import { obj2formdatastr } from '@/utils/utils.js'
 import { getToken, getUserAgent } from '@/utils/auth'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
-const calendarTypeOptions = [
-  { key: '10', label: '可用初始训练数据' },
-  { key: '11', label: '人工校准' },
-  { key: '12', label: '识率很高数据' },
-  { key: '13', label: '临时标志中间处理数据' }
-]
-
-const sortOptions = [
-  { key: 'city', label: '城市管理' },
-  { key: 'admn', label: '行政效能' },
-  { key: 'envr', label: '环境保护' },
-  { key: 'depa', label: '部门管理' },
-  { key: 'account', label: '账号管理' },
-  { key: 'street', label: '镇街管理' },
-  { key: 'service', label: '集中日志管理' },
-  { key: 'matter', label: '事项管理' },
-  { key: 'public', label: '舆情分析配置' }
-]
-
 export default {
   name: 'ComplexTable',
   components: { Pagination },
@@ -234,8 +171,6 @@ export default {
         state: '',
         sort: '+id'
       },
-      calendarTypeOptions,
-      sortOptions,
       statusOptions: ['published', 'draft', 'deleted'],
       temp: {
         isNew: true,
@@ -322,12 +257,17 @@ export default {
     getList() {
       this.listLoading = true
       request(
-        `/admin/user/sysUser/search?size=${this.listQuery.limit}&page=${this
-          .listQuery.page -
-          1}&tokenid=${getToken()}&userAgent=${getUserAgent()}`
+        `/admin/user/sysUser/search?size=${this.listQuery.limit}&page=${this.listQuery.page -1}`
       ).then(data => {
-        this.list = data.rows
-        this.total = data.total
+        if(data.code === 20020){
+          this.$message({
+            message: '会话失效，请重新登陆',
+            type: 'error'
+          })
+        }else{
+          this.list = data.rows
+          this.total = data.total
+        }
 
         // Just to simulate the time of the request
         setTimeout(() => {
@@ -456,11 +396,8 @@ export default {
         direction: 'DESC'
       })
       window.location.href =
-        'http://12345v2.dgdatav.com:6080/api/sg/citymanagement/export?' +
-        params
-      request('/sg/citymanagement/export?' + params).then(data => {
+        'http://12345v2.dgdatav.com:6080/api/sg/citymanagement/export?' + params
         this.downloadLoading = false
-      })
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v =>
@@ -477,9 +414,5 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.filter-container {
-  display: flex;
-  justify-content: space-between;
-}
 </style>
 

@@ -3,11 +3,15 @@
     <div class="filter-container">
       <div class="filter-items">
         <span>服务名称：</span>
-        <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+        <el-input v-model="listQuery.serviceName" placeholder="请输入" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       </div>
       <div class="filter-items">
-        <span>模块：</span>
-        <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+        <span>账号：</span>
+        <el-input v-model="listQuery.userAccount" placeholder="请输入" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      </div>
+      <div class="filter-items">
+        <span>账号名称：</span>
+        <el-input v-model="listQuery.userFullname" placeholder="请输入" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       </div>
       <div class="filter-items">
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
@@ -22,15 +26,14 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;"
-      @sort-change="sortChange">
+      style="width: 100%;">
       <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
       <el-table-column label="服务名称" prop="serviceName" min-width="200"/>
       <el-table-column label="账号" prop="userAccount" min-width="200"/>
       <el-table-column label="账号名称" prop="userFullname" min-width="200"/>
-      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="100" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
+          <!-- <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button> -->
           <el-button size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">删除
           </el-button>
         </template>
@@ -77,31 +80,6 @@ import { request, post, put, reqDelete } from '@/utils/req.js'
 import { obj2formdatastr } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
-const calendarTypeOptions = [
-  { key: '10', label: '可用初始训练数据' },
-  { key: '11', label: '人工校准' },
-  { key: '12', label: '识率很高数据' },
-  { key: '13', label: '临时标志中间处理数据' }
-]
-
-const sortOptions = [
-  { key: 'city', label: '城市管理' },
-  { key: 'admn', label: '行政效能' },
-  { key: 'envr', label: '环境保护' },
-  { key: 'depa', label: '部门管理' },
-  { key: 'account', label: '账号管理' },
-  { key: 'street', label: '镇街管理' },
-  { key: 'service', label: '集中日志管理' },
-  { key: 'matter', label: '事项管理' },
-  { key: 'public', label: '舆情分析配置' }
-]
-
-// arr to obj ,such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
-
 export default {
   name: 'ComplexTable',
   components: { Pagination },
@@ -126,18 +104,12 @@ export default {
       total: 0,
       listLoading: true,
       listQuery: {
-        id: '',
+        serviceName: '',
+        userAccount: '',
+        userFullname: '',
         page: 1,
         limit: 10,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
-        state: '',
-        sort: '+id'
       },
-      calendarTypeOptions,
-      sortOptions,
-      statusOptions: ['published', 'draft', 'deleted'],
       temp: {
         bid: '',
         keyword: '',
@@ -166,6 +138,9 @@ export default {
     getList() {
       this.listLoading = true
       const params = obj2formdatastr({
+        serviceName: this.listQuery.serviceName,
+        userAccount: this.listQuery.userAccount,
+        userFullname: this.listQuery.userFullname,
         page: this.listQuery.page,
         size: this.listQuery.limit
       })
@@ -187,25 +162,12 @@ export default {
       this.$router.push({ path: '/' + this.listQuery.type + '/index' })
     },
     handleFilter() {
-      request('/sg/item/sgSentimentAddress/' + this.listQuery.id).then(data => {
-        if (data.length !== 0) {
-          this.list = []
-          this.list.push(data)
-          this.listQuery.page = 1
-          this.total = 1
-        } else {
-          this.list = []
-          this.listQuery.page = 0
-          this.total = 0
-        }
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 0.5 * 1000)
-      })
+      this.listQuery.page = 1
+      this.listQuery.limit = 10
+      this.getList()
     },
     handleModifyStatus(row, status) {
-      reqDelete('/sg/item/sgSentimentAddress/' + row.bid).then(data => {
+      reqDelete('/sg/base/sgServiceUser/deleteSgServicUser/' + row.serviceId).then(data => {
         this.$notify({
           title: '成功',
           message: '删除成功',
@@ -217,20 +179,6 @@ export default {
       })
       row.status = status
     },
-    sortChange(data) {
-    //   const { prop, order } = data
-    //   if (prop === 'id') {
-    //     this.sortByID(order)
-    //   }
-    },
-    // sortByID(order) {
-    //   if (order === 'ascending') {
-    //     this.listQuery.sort = '+id'
-    //   } else {
-    //     this.listQuery.sort = '-id'
-    //   }
-    //   this.handleFilter()
-    // },
     resetTemp() {
       this.temp = {
         bid: '',

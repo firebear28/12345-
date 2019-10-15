@@ -1,24 +1,22 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <div>
-        ID查询：
+      <div class="filter-items">
+        <span>ID查询：</span>
         <el-input
           v-model="listQuery.id"
           placeholder="请输入订单编号"
-          style="width: 200px;"
           clearable
           @keyup.enter.native="handleFilter"
           @clear="getList"
         />
       </div>
-      <div>
-        状态：
+      <div class="filter-items">
+        <span>状态：</span>
         <el-select
           v-model="listQuery.state"
           placeholder="请选择状态"
           clearable
-          style="width: 130px"
           @change="getList"
         >
           <el-option
@@ -29,8 +27,8 @@
           />
         </el-select>
       </div>
-      <div>
-        日期：
+      <div class="filter-items">
+        <span>日期：</span>
         <el-date-picker
           v-model="month"
           type="month"
@@ -39,7 +37,7 @@
           @change="changeDtae"
         />
       </div>
-      <div>
+      <div class="filter-items">
         <el-button v-waves type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
         <el-button
           v-waves
@@ -88,12 +86,7 @@
     />
 
     <el-dialog :visible.sync="dialogFormVisible" title="编辑">
-      <el-form
-        ref="dataForm"
-        :model="temp"
-        label-width="140px"
-        style="width: 100%; padding-left:50px; padding-right:50px;"
-      >
+      <el-form ref="dataForm" class="dataForm" :model="temp" label-position="left" label-width="140px">
         <el-form-item label="标题：" prop="title">
           <span>{{ temp.title }}</span>
         </el-form-item>
@@ -111,7 +104,7 @@
           <el-input v-model="temp.subClazz" style="width:80%"/>
         </el-form-item>
         <el-form-item label="专题标签：" prop="subTags">
-          <!-- <el-cascader
+          <el-cascader
             ref="cascader"
             :options="matterItems"
             :props="props"
@@ -120,8 +113,8 @@
             placeholder="请选择"
             filterable
             clearable
-          /> -->
-          <span>{{ temp.subTags }}</span>
+            style="width:80%"
+          />
         </el-form-item>
         <el-form-item label="专题分类的准确率：" prop="subClazzProba">
           <span>{{ temp.subClazzProba }}</span>
@@ -201,6 +194,16 @@ export default {
         ) || [],
       downloadLoading: false
     }
+  },
+  watch: {
+    'temp.subTags': {
+      handler(newV) {
+        let subTags = newV
+        if(~subTags.indexOf('（')) subTags = subTags.replace(/（/g, "")
+        if(~subTags.indexOf('）')) subTags = subTags.replace(/）/g, "")
+        this.temp.subTags = subTags
+      },
+    },
   },
   created() {
     this.getList()
@@ -312,10 +315,6 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.filter-container {
-  display: flex;
-  justify-content: space-between;
-}
 /deep/.el-textarea__inner {
   height: 120px;
 }
