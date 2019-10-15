@@ -456,7 +456,7 @@ export default {
         direction: 'DESC'
       })
       window.location.href =
-        'http://12345v1.dgdatav.com:6080/api/sg/citymanagement/export?' +
+        'http://12345v2.dgdatav.com:6080/api/sg/citymanagement/export?' +
         params
       request('/sg/citymanagement/export?' + params).then(data => {
         this.downloadLoading = false

@@ -306,7 +306,7 @@ export default {
         page: this.listQuery.page,
         size: this.listQuery.limit
       })
-      window.location.href = 'http://12345v1.dgdatav.com:6080/api/sg/item/sgSentimentAddress/export?' + params
+      window.location.href = 'http://12345v2.dgdatav.com:6080/api/sg/item/sgSentimentAddress/export?' + params
       request('/sg/item/sgSentimentAddress/export?' + params).then(data => {
         this.downloadLoading = false
       })

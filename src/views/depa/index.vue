@@ -11,7 +11,7 @@
       </div>
       <div class="filter-items">
         <span>子系统：</span>
-        <el-select v-model="listQuery.eq_subId" placeholder="请选择" clearable style="width: 100%" class="filter-item" @change="changeTopics">
+        <el-select v-model="listQuery.eq_subId" placeholder="请选择" clearable style="width: 100%" class="filter-item" @change="handleFilter">
           <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
         </el-select>
       </div>
@@ -46,19 +46,18 @@
     <pagination :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" class="dataForm" :rules="rules" :model="temp" label-position="left" label-width="140px">
-        <el-form-item label="主部门" prop="departName">
+      <el-form ref="dataForm" class="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px">
+        <el-form-item label="主部门：" prop="departName">
           <el-input v-model="temp.departName"/>
         </el-form-item>
-        <el-form-item label="智网部门" prop="rootDepartId">
-          <el-select v-model="listQuery.eq_subId" placeholder="请选择" clearable style="width: 100%" class="filter-item" @change="changeTopics">
+        <el-form-item label="系统：" prop="subId">
+          <span v-if="dialogStatus === 'update'">{{ temp.subId }}</span>
+          <el-select v-else v-model="temp.subId" placeholder="请选择" clearable style="width: 100%">
             <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="热线部门" prop="rootDepartName">
-          <el-select v-model="listQuery.eq_subId" placeholder="请选择" clearable style="width: 100%" class="filter-item" @change="changeTopics">
-            <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
-          </el-select>
+        <el-form-item label="系统部门：" prop="subDepartName">
+          <el-input v-model="temp.subDepartName"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -113,20 +112,11 @@ export default {
       sortOptions,
       statusOptions: ['published', 'draft', 'deleted'],
       temp: {
-        departId: '',
-        departName: '',
         id: '',
-        isNew: '',
-        remark: '',
-        rootDepartId: '',
-        subDepartId: '',
-        subDepartLevel: '',
+        departName: '',
         subDepartName: '',
         subId: '',
-        subRootDepartId: '',
-        subRootDepartName: '',
-        subRootDepartType: '',
-        status: 'published'
+        isNew: true,
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -172,11 +162,17 @@ export default {
       this.$router.push({ path: '/' + this.listQuery.type + '/index' })
     },
     handleFilter() {
-      request('/sg/department/sgMainDepartment/' + this.listQuery.id).then(data => {
-        this.list = []
-        this.list.push(data)
+      const params = obj2formdatastr({
+        like_departName: this.listQuery.like_departName,
+        like_subDepartName: this.listQuery.like_subDepartName,
+        eq_subId: this.listQuery.eq_subId,
+        size: this.listQuery.limit
+      })
+      request('/sg/department/sgMainDepartment/search?' + params).then(data => {
+        // this.list = []
+        this.list = data.rows
         this.listQuery.page = 1
-        this.total = 1
+        this.total = data.total
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
@@ -194,19 +190,11 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        departId: '',
-        departName: '',
         id: '',
-        isNew: true,
-        remark: '',
-        rootDepartId: '',
-        subDepartId: '',
-        subDepartLevel: '',
+        departName: '',
         subDepartName: '',
         subId: '',
-        subRootDepartId: '',
-        subRootDepartName: '',
-        subRootDepartType: ''
+        isNew: true,
       }
     },
     handleCreate() {
@@ -235,17 +223,18 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.temp.isNew = false
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
-      request('/sg/department/sgMainDepartment/' + row.id).then(request => {
-        this.temp = request.data
-      })
+      // request('/sg/department/sgMainDepartment/' + row.id).then(request => {
+      //   this.temp = request.data
+      // })
+      this.temp = Object.assign({}, row) // copy obj
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
     },
     updateData() {
+      this.temp.isNew = false
       const params = obj2formdatastr(this.temp)
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
@@ -283,10 +272,9 @@ export default {
         property: 'acceptTime',
         direction: 'DESC'
       })
-      request('/sg/citymanagement/export?' + params).then(data => {
-        window.location.href = 'http://12345v1.dgdatav.com:6080/api/sg/citymanagement/export?' + params
-        this.downloadLoading = false
-      })
+      
+      window.location.href = 'http://12345v2.dgdatav.com:6080/api/sg/citymanagement/export?' + params
+      this.downloadLoading = false
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {

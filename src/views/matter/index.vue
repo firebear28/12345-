@@ -3,7 +3,7 @@
     <div class="filter-container">
       <div class="filter-items">
         <span>主事项：</span>
-        <el-input v-model="listQuery.like_departName" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
+        <el-input v-model="listQuery.itemName" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
       </div>
       <div class="filter-items">
         <span>上级事项：</span>
@@ -11,11 +11,11 @@
       </div>
       <div class="filter-items">
         <span>子系统事项：</span>
-        <el-input v-model="listQuery.like_subDepartName" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
+        <el-input v-model="listQuery.subIden" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
       </div>
       <div class="filter-items">
         <span>子系统：</span>
-        <el-select v-model="listQuery.eq_subId" placeholder="请选择" clearable style="width: 100%" class="filter-item" @change="changeTopics">
+        <el-select v-model="listQuery.subIden" placeholder="请选择" clearable style="width: 100%" class="filter-item" @change="changeTopics">
           <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
         </el-select>
       </div>
@@ -32,8 +32,7 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;"
-      @sort-change="sortChange">
+      style="width: 100%;">
       <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
       <!-- <el-table-column label="事项id" prop="itemId" width="100"/> -->
       <el-table-column label="主事项" prop="itemName" min-width="200"/>
@@ -52,30 +51,18 @@
     <pagination :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="140px" style="width: 500px; margin-left:50px;">
-        <el-form-item label="事项id" prop="itemId">
-          <el-input v-model="temp.itemId"/>
-        </el-form-item>
+      <el-form ref="dataForm" class="dataForm" :rules="rules" :model="temp" label-position="left" label-width="140px">
         <el-form-item label="事项名称" prop="itemName">
           <el-input v-model="temp.itemName"/>
         </el-form-item>
-        <el-form-item label="上级事项id" prop="pid">
-          <el-input v-model="temp.pid"/>
-        </el-form-item>
-        <el-form-item label="事项类型" prop="itemType">
-          <el-input v-model="temp.itemType"/>
+        <el-form-item label="系统" prop="subIden">
+          <span v-if="dialogStatus === 'update'">{{ temp.subIden }}</span>
+          <el-select v-else v-model="temp.subIden" placeholder="请选择" clearable style="width: 100%">
+            <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
+          </el-select>
         </el-form-item>
         <el-form-item label="事项部门" prop="itemDepart">
           <el-input v-model="temp.itemDepart"/>
-        </el-form-item>
-        <el-form-item label="源事项id" prop="subItemId">
-          <el-input v-model="temp.subItemId"/>
-        </el-form-item>
-        <el-form-item label="源事项名称" prop="subItemName">
-          <el-input v-model="temp.subItemName"/>
-        </el-form-item>
-        <el-form-item label="事项来源" prop="subIden">
-          <el-input v-model="temp.subIden"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -105,30 +92,10 @@ import { request, post, reqDelete, put } from '@/utils/req.js'
 import { obj2formdatastr } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
-const calendarTypeOptions = [
-  { key: '10', label: '可用初始训练数据' },
-  { key: '11', label: '人工校准' },
-  { key: '12', label: '识率很高数据' },
-  { key: '13', label: '临时标志中间处理数据' }
-]
-
 const sortOptions = [
-  { key: 'city', label: '城市管理' },
-  { key: 'admn', label: '行政效能' },
-  { key: 'envr', label: '环境保护' },
-  { key: 'depa', label: '部门管理' },
-  { key: 'account', label: '账号管理' },
-  { key: 'street', label: '镇街管理' },
-  { key: 'service', label: '集中日志管理' },
-  { key: 'matter', label: '事项管理' },
-  { key: 'public', label: '舆情分析配置' }
+  { key: 'HL', label: '热线' },
+  { key: 'ZW', label: '智网' }
 ]
-
-// arr to obj ,such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
 
 export default {
   name: 'ComplexTable',
@@ -163,17 +130,11 @@ export default {
         state: '',
         sort: '+id'
       },
-      calendarTypeOptions,
       sortOptions,
       statusOptions: ['published', 'draft', 'deleted'],
       temp: {
-        mid: '',
         itemId: '',
         itemName: '',
-        pid: '',
-        itemType: '',
-        itemDepart: '',
-        subItemId: '',
         subItemName: '',
         subIden: ''
       },
@@ -246,29 +207,10 @@ export default {
       })
       row.status = status
     },
-    sortChange(data) {
-    //   const { prop, order } = data
-    //   if (prop === 'id') {
-    //     this.sortByID(order)
-    //   }
-    },
-    // sortByID(order) {
-    //   if (order === 'ascending') {
-    //     this.listQuery.sort = '+id'
-    //   } else {
-    //     this.listQuery.sort = '-id'
-    //   }
-    //   this.handleFilter()
-    // },
     resetTemp() {
       this.temp = {
-        mid: '',
         itemId: '',
         itemName: '',
-        pid: '',
-        itemType: '',
-        itemDepart: '',
-        subItemId: '',
         subItemName: '',
         subIden: ''
       }
@@ -299,13 +241,14 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
+      this.temp = Object.assign({}, row) // copy obj
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
     },
+
     updateData() {
       const params = obj2formdatastr(this.temp)
       this.$refs['dataForm'].validate((valid) => {
@@ -337,12 +280,6 @@ export default {
         this.list.splice(index, 1)
       })
     },
-    handleFetchPv(pv) {
-      fetchPv(pv).then(response => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
-    },
     // 导出
     handleDownload() {
       this.downloadLoading = true
@@ -350,10 +287,8 @@ export default {
         page: this.listQuery.page,
         size: this.listQuery.limit
       })
-      request('/sg/twoconitem/export?' + params).then(data => {
-        window.location.href = 'http://12345v1.dgdatav.com:6080/api/sg/twoconitem/export?' + params
-        this.downloadLoading = false
-      })
+      window.location.href = 'http://12345v2.dgdatav.com:6080/api/sg/twoconitem/export?' + params
+      this.downloadLoading = false
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {
@@ -381,6 +316,10 @@ export default {
         white-space: nowrap;
       }
     }
+  }
+  .dataForm {
+    width: 100%;
+    padding: 50px;
   }
 </style>
 

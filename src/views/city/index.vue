@@ -195,13 +195,7 @@ export default {
         emitPath: false
       },
       // 专题标签
-      matterItems:
-        maybe(
-          _ => JSON.parse(window.localStorage.getItem('themeMatterItems')),
-          []
-        ) || [],
-      downloadLoading: false
-    }
+      matterItems: maybe( _ => JSON.parse(window.localStorage.getItem('themeMatterItems')), [] ) || [], downloadLoading: false }
   },
   created() {
     this.getList()
