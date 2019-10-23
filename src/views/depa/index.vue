@@ -106,7 +106,7 @@ export default {
         like_departName: '',
         like_subDepartName: '',
         eq_subId: '',
-        page: 1,
+        page: 0,
         limit: 10
       },
       sortOptions,
@@ -180,6 +180,11 @@ export default {
       })
     },
     handleModifyStatus(row, status) {
+      this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
       post('/sg/department/sgMainDepartment/delete?' + row.departId).then(data => {
         this.$message({
           message: '操作成功',
@@ -187,6 +192,7 @@ export default {
         })
       })
       row.status = status
+      })
     },
     resetTemp() {
       this.temp = {
@@ -289,23 +295,5 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-  .filter-container{
-    display: flex;
-    justify-content: space-between;
-    .filter-items {
-      display: flex;
-      justify-content: flex-start;
-      align-items: baseline;
-      width: 25%;
-      margin: 0 10px;
-      span {
-        white-space: nowrap;
-      }
-    }
-  }
-  .dataForm {
-    width: 100%;
-    padding: 50px;
-  }
 </style>
 

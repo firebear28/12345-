@@ -105,7 +105,7 @@ export default {
       listLoading: true,
       listQuery: {
         departName: '',
-        page: 1,
+        page: 0,
         limit: 10,
       },
       temp: {
@@ -163,17 +163,23 @@ export default {
       this.getList()
     },
     handleModifyStatus(row, status) {
-      reqDelete('/sg/department/sgDepartmentAlarm/deleteSgDepartmentAlarm/' + row.departId).then(data => {
-        this.$notify({
-          title: '成功',
-          message: '删除成功',
-          type: 'success',
-          duration: 2000
+      this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        reqDelete('/sg/department/sgDepartmentAlarm/deleteSgDepartmentAlarm/' + row.departId).then(data => {
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
+          const index = this.list.indexOf(row)
+          this.list.splice(index, 1)
         })
-        const index = this.list.indexOf(row)
-        this.list.splice(index, 1)
+        row.status = status
       })
-      row.status = status
     },
 
     resetTemp() {
@@ -246,22 +252,5 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-  .filter-container{
-    display: flex;
-    justify-content: flex-start;
-    .filter-items {
-      display: flex;
-      justify-content: flex-start;
-      align-items: baseline;
-      margin-right: 20px;
-      span {
-        white-space: nowrap;
-      }
-    }
-  }
-  .dataForm {
-    width: 100%;
-    padding: 50px;
-  }
 </style>
 

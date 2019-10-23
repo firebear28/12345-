@@ -83,7 +83,7 @@ export default {
       listLoading: true,
       listQuery: {
         account: 'dgdp',
-        page: 1,
+        page: 0,
         limit: 10,
       },
       statusOptions: ['published', 'draft', 'deleted'],
@@ -258,18 +258,5 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-  .filter-container{
-    display: flex;
-    justify-content: flex-start;
-    .filter-items {
-      display: flex;
-      justify-content: flex-start;
-      align-items: baseline;
-      margin-right: 20px;
-      span {
-        white-space: nowrap;
-      }
-    }
-  }
 </style>
 

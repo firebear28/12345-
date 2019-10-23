@@ -101,7 +101,7 @@ export default {
       listLoading: true,
       listQuery: {
         id: '',
-        page: 1,
+        page: 0,
         limit: 10,
         importance: undefined,
         title: undefined,
@@ -289,23 +289,5 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-  .filter-container{
-    display: flex;
-    justify-content: space-between;
-    .filter-items {
-      display: flex;
-      justify-content: flex-start;
-      align-items: baseline;
-      width: 33%;
-      margin: 0 10px;
-      span {
-        white-space: nowrap;
-      }
-    }
-  }
-  .dataForm {
-    width: 100%;
-    padding: 50px;
-  }
 </style>
 

@@ -128,7 +128,7 @@ export default {
       listLoading: true,
       listQuery: {
         id: '',
-        page: 1,
+        page: 0,
         limit: 10,
         importance: undefined,
         title: undefined,
@@ -206,6 +206,11 @@ export default {
       })
     },
     handleModifyStatus(row, status) {
+      this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
       reqDelete('/sg/item/sgSentimentKeyword/' + row.bid).then(data => {
         this.$notify({
           title: '成功',
@@ -217,6 +222,7 @@ export default {
         this.list.splice(index, 1)
       })
       row.status = status
+      })
     },
     sortChange(data) {
     //   const { prop, order } = data

@@ -116,7 +116,7 @@ export default {
       listLoading: true,
       listQuery: {
         serviceName: '',
-        page: 1,
+        page: 0,
         limit: 10,
       },
       sortOptions,
@@ -171,6 +171,11 @@ export default {
       this.getList()
     },
     handleModifyStatus(row, status) {
+      this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
       reqDelete('/sg/base/sgService//deleteSgService/' + row.serviceId).then(data => {
         this.$notify({
           title: '成功',
@@ -182,6 +187,7 @@ export default {
         this.list.splice(index, 1)
       })
       row.status = status
+      })
     },
     resetTemp() {
       this.temp = {
@@ -276,18 +282,5 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-  .filter-container{
-    display: flex;
-    justify-content: flex-start;
-    .filter-items {
-      display: flex;
-      justify-content: flex-start;
-      align-items: baseline;
-      margin-right: 20px;
-      span {
-        white-space: nowrap;
-      }
-    }
-  }
 </style>
 

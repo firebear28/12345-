@@ -53,7 +53,7 @@ export default {
       listLoading: true,
       listQuery: {
         id: '',
-        page: 1,
+        page: 0,
         limit: 10,
         importance: undefined,
         title: undefined,

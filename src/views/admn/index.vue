@@ -160,7 +160,7 @@ export default {
       listLoading: false,
       listQuery: {
         id: '',
-        page: 1,
+        page: 0,
         limit: 10,
         importance: undefined,
         title: undefined,
