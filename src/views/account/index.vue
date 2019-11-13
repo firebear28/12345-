@@ -264,6 +264,10 @@ export default {
             message: '会话失效，请重新登陆',
             type: 'error'
           })
+          // 跳转到登陆页面重新登陆
+          this.$store.dispatch('LogOut').then(() => {
+            location.reload()   // reload() 方法类似于你浏览器上的刷新页面按钮
+          })
         }else{
           this.list = data.rows
           this.total = data.total
@@ -286,7 +290,7 @@ export default {
       request('/admin/user/sysUser/' + this.listQuery.id).then(data => {
         this.list = []
         this.list.push(data)
-        this.listQuery.page = 1
+        this.listQuery.page = 0
         this.total = 1
         // Just to simulate the time of the request
         setTimeout(() => {

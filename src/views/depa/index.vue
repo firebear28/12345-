@@ -50,9 +50,9 @@
         <el-form-item label="主部门：" prop="departName">
           <el-input v-model="temp.departName"/>
         </el-form-item>
-        <el-form-item label="系统：" prop="subId">
-          <span v-if="dialogStatus === 'update'">{{ temp.subId }}</span>
-          <el-select v-else v-model="temp.subId" placeholder="请选择" clearable style="width: 100%">
+        <el-form-item label="系统：" prop="subName">
+          <span v-if="dialogStatus === 'update'">{{ temp.subName }}</span>
+          <el-select v-else v-model="temp.subName" placeholder="请选择" clearable style="width: 100%">
             <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
           </el-select>
         </el-form-item>
@@ -115,7 +115,7 @@ export default {
         id: '',
         departName: '',
         subDepartName: '',
-        subId: '',
+        subName: '',
         isNew: true,
       },
       dialogFormVisible: false,
@@ -171,7 +171,7 @@ export default {
       request('/sg/department/sgMainDepartment/search?' + params).then(data => {
         // this.list = []
         this.list = data.rows
-        this.listQuery.page = 1
+        this.listQuery.page = 0
         this.total = data.total
         // Just to simulate the time of the request
         setTimeout(() => {
@@ -199,7 +199,7 @@ export default {
         id: '',
         departName: '',
         subDepartName: '',
-        subId: '',
+        subName: '',
         isNew: true,
       }
     },

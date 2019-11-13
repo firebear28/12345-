@@ -137,7 +137,7 @@
 
 <script>
 import waves from '@/directive/waves' // Waves directive
-import { request, put } from '@/utils/req.js'
+import { request, post } from '@/utils/req.js'
 import { obj2formdatastr, maybe } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -160,14 +160,13 @@ export default {
       total: 0,
       listLoading: false,
       listQuery: {
-        id: '',
-        page: 0,
+        eq_id: '',
+        page: 1,
         limit: 10,
         importance: undefined,
         title: undefined,
         type: undefined,
         state: '',
-        sort: '+id'
       },
       // 状态切换
       calendarTypeOptions,
@@ -204,14 +203,12 @@ export default {
     getList() {
       this.listLoading = true
       if (!this.month) this.month = ''
-      if (!this.state) this.state = ''
       const params = obj2formdatastr({
+        eq_id: this.listQuery.eq_id,
         month: this.month,
-        pageNumber: this.listQuery.page,
-        pageSize: this.listQuery.limit,
-        state: this.listQuery.state,
-        property: 'acceptTime',
-        direction: 'DESC'
+        page: this.listQuery.page-1,
+        size: this.listQuery.limit,
+        eq_state: this.listQuery.state,
       })
       request('/sg/environment/findByPage?' + params).then(data => {
         this.list = data.content
@@ -243,19 +240,8 @@ export default {
       }
     },
     handleFilter() {
-      if (!this.listQuery.id) {
-        this.getList()
-      } else {
-        request('/sg/environment/' + this.listQuery.id).then(data => {
-          data ? this.list = data : this.list = []
-          this.listQuery.page = 1
-          this.total = 1
-          // Just to simulate the time of the request
-          setTimeout(() => {
-            this.listLoading = false
-          }, 0.5 * 1000)
-        })
-      }
+      this.listQuery.page = 1
+      this.getList()
     },
     // 编辑
     handleUpdate(row) {
@@ -268,13 +254,13 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          const params = obj2formdatastr({
+          const params = {
             orderId: this.temp.orderId,
             state: this.temp.state,
             subClazz: this.temp.subClazz,
             subTags: this.temp.subTags
-          })
-          put('/sg/environment?' + params).then(data => {
+          }
+          post('/sg/environment/', params).then(data => {
             if (data.code === 200) {
               this.getList()
               this.$message.success('修改成功！')

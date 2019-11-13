@@ -26,7 +26,7 @@ axios.interceptors.request.use(config => {
   // 中文转为decode编码
   config.url = encodeURI(config.url)
   // 设置公共URL http://12345v2.alltosea.com:6080/api
-  config.baseURL = process.env.NODE_ENV === 'development' ? 'http://12345v2.alltosea.com:6080/api' : '/api'
+  config.baseURL = process.env.NODE_ENV === 'development' ? 'http://19.104.40.37:8082/api' : '/api'
 
   // 如果url包含admin/user/sysUser则需要添加tokenid和userAgent
   if (config.url.indexOf('admin/user/sysUser') !== -1) { config.params = { tokenid: getToken(), userAgent: getUserAgent() } }
@@ -81,7 +81,7 @@ export const post = (url, options = {}) => {
 }
 // put请求
 export const put = (url, options = {}) => {
-  // 正式开始post请求
+  // 正式开始put请求
   return axios.put(url, options).then(checkStatus)
 }
 // delete请求

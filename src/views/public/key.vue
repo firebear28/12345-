@@ -192,7 +192,7 @@ export default {
         if (data.length != 0) {
           this.list = []
           this.list.push(data)
-          this.listQuery.page = 1
+          this.listQuery.page = 0
           this.total = 1
         } else {
           this.list = []

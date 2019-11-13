@@ -166,7 +166,7 @@ export default {
       request('/sg/citymanagement/' + this.listQuery.id).then(data => {
         this.list = []
         this.list.push(data)
-        this.listQuery.page = 1
+        this.listQuery.page = 0
         this.total = 1
         // Just to simulate the time of the request
         setTimeout(() => {

@@ -162,7 +162,7 @@ export default {
       this.$router.push({ path: '/' + this.listQuery.type + '/index' })
     },
     handleFilter() {
-      this.listQuery.page = 1
+      this.listQuery.page = 0
       this.listQuery.limit = 10
       this.getList()
     },

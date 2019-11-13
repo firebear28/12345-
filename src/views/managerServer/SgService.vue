@@ -166,7 +166,7 @@ export default {
       return (index + 1) + 10 * (this.listQuery.page - 1)
     },
     handleFilter() {
-      this.listQuery.page = 1
+      this.listQuery.page = 0
       this.listQuery.limit = 10
       this.getList()
     },

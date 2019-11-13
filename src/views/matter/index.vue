@@ -38,7 +38,7 @@
       <el-table-column label="主事项" prop="itemName" min-width="200"/>
       <el-table-column label="事项类型" prop="itemType" min-width="150"/>
       <el-table-column label="子事项" prop="subItemName" min-width="200"/>
-      <el-table-column label="子系统" prop="subIden" align="center" width="150"/>
+      <el-table-column label="子系统" prop="subName" align="center" width="150"/>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
@@ -55,9 +55,9 @@
         <el-form-item label="事项名称" prop="itemName">
           <el-input v-model="temp.itemName"/>
         </el-form-item>
-        <el-form-item label="系统" prop="subIden">
-          <span v-if="dialogStatus === 'update'">{{ temp.subIden }}</span>
-          <el-select v-else v-model="temp.subIden" placeholder="请选择" clearable style="width: 100%">
+        <el-form-item label="系统" prop="subName">
+          <span v-if="dialogStatus === 'update'">{{ temp.subName }}</span>
+          <el-select v-else v-model="temp.subName" placeholder="请选择" clearable style="width: 100%">
             <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
           </el-select>
         </el-form-item>
@@ -185,7 +185,7 @@ export default {
       request('/sg/twoconitem/' + this.listQuery.id).then(data => {
         this.list = []
         this.list.push(data)
-        this.listQuery.page = 1
+        this.listQuery.page = 0
         this.total = 1
         // Just to simulate the time of the request
         setTimeout(() => {
