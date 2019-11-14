@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      ID查询：
+      <!-- ID查询：
       <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       名称：
       <el-select v-model="listQuery.state" placeholder="请选择名称" clearable class="filter-item" style="width: 130px" @change="getList">
@@ -13,7 +13,7 @@
       </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
+      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button> -->
     </div>
 
     <el-table
@@ -128,7 +128,7 @@ export default {
       listLoading: true,
       listQuery: {
         id: '',
-        page: 0,
+        page: 1,
         limit: 10,
         importance: undefined,
         title: undefined,
@@ -167,7 +167,7 @@ export default {
     getList() {
       this.listLoading = true
       const params = obj2formdatastr({
-        page: this.listQuery.page,
+        page: this.listQuery.page - 1,
         size: this.listQuery.limit
       })
       request('/sg/item/sgSentimentAddress/findByPage?' + params).then(data => {
@@ -192,11 +192,11 @@ export default {
         if (data.length != 0) {
           this.list = []
           this.list.push(data)
-          this.listQuery.page = 0
+          this.listQuery.page = 1
           this.total = 1
         } else {
           this.list = []
-          this.listQuery.page = 0
+          this.listQuery.page = 1
           this.total = 0
         }
         // Just to simulate the time of the request

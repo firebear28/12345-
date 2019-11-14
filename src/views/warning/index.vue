@@ -24,9 +24,9 @@
       <el-table-column label="总数预警值" prop="countAlarm" min-width="200"/>
       <el-table-column label="办结率预警值" prop="doneAlarm" width="200"/>
       <el-table-column label="满意度预警值" prop="satisfyAlarm" width="250"/>
-      <el-table-column label="操作" align="center" width="100" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <!-- <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button> -->
+          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">删除
           </el-button>
         </template>
@@ -40,17 +40,17 @@
         <el-form-item label="部门" prop="departName">
           <span v-if="dialogStatus === 'update'">{{ temp.departName }}</span>
         </el-form-item>
-        <el-form-item label="逾期数预警值" prop="cardAlarm">
-          <el-input v-model="temp.cardAlarm"/>
-        </el-form-item>
         <el-form-item label="总数预警值" prop="countAlarm">
           <el-input v-model="temp.countAlarm"/>
         </el-form-item>
-        <el-form-item label="办结率预警值" prop="doneAlarm">
-          <el-input v-model="temp.doneAlarm"/>
+        <el-form-item label="逾期数预警值" prop="cardAlarm">
+          <el-input v-model="temp.cardAlarm"/>
         </el-form-item>
         <el-form-item label="满意度预警值" prop="satisfyAlarm">
           <el-input v-model="temp.satisfyAlarm"/>
+        </el-form-item>
+        <el-form-item label="办结率预警值" prop="doneAlarm">
+          <el-input v-model="temp.doneAlarm"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -76,7 +76,7 @@
 <script>
 import waves from '@/directive/waves' // Waves directive
 import { parseTime } from '@/utils'
-import { request, post, put, reqDelete } from '@/utils/req.js'
+import { request, post, reqDelete } from '@/utils/req.js'
 import { obj2formdatastr } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -105,13 +105,15 @@ export default {
       listLoading: true,
       listQuery: {
         departName: '',
-        page: 0,
+        page: 1,
         limit: 10,
       },
       temp: {
-        bid: '',
-        keyword: '',
-        type: ''
+        departId: '',
+        countAlarm: '',
+        cardAlarm: '',
+        satisfyAlarm: '',
+        doneAlarm: '',
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -136,8 +138,8 @@ export default {
     getList() {
       this.listLoading = true
       const params = obj2formdatastr({
-        departName: this.listQuery.departName,
-        page: this.listQuery.page,
+        like_departName: this.listQuery.departName,
+        page: this.listQuery.page - 1,
         size: this.listQuery.limit
       })
       request('sg/department/sgDepartmentAlarm/queryByPage?' + params).then(data => {
@@ -158,8 +160,7 @@ export default {
       this.$router.push({ path: '/' + this.listQuery.type + '/index' })
     },
     handleFilter() {
-      this.listQuery.page = 0
-      this.listQuery.limit = 10
+      this.listQuery.page = 1
       this.getList()
     },
     handleModifyStatus(row, status) {
@@ -214,6 +215,7 @@ export default {
         }
       })
     },
+    // 点击编辑
     handleUpdate(row) {
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
@@ -222,18 +224,35 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
+    // 提交编辑
     updateData() {
-      const params = obj2formdatastr(this.temp)
+      const params = {
+        departId: this.temp.departId,
+        countAlarm: this.temp.countAlarm,
+        cardAlarm: this.temp.cardAlarm,
+        satisfyAlarm: this.temp.satisfyAlarm,
+        doneAlarm: this.temp.doneAlarm,
+      }
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          put('/sg/item/sgSentimentAddress/update?' + params).then(data => {
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
+          post('/sg/department/sgDepartmentAlarm/', params).then(data => {
+            if(data.code === 200){
+              this.list.unshift(this.temp)
+              this.dialogFormVisible = false
+              this.$notify({
+                title: '成功',
+                message: '更新成功',
+                type: 'success',
+                duration: 2000
+              })
+            }else{
+              this.$notify({
+                title: '错误',
+                message: data.message,
+                type: 'error',
+                duration: 2000
+              })
+            }
             this.getList()
           })
         }

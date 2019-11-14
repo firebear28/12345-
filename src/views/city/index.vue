@@ -200,7 +200,7 @@ export default {
       const params = obj2formdatastr({
         eq_id: this.listQuery.eq_id,
         month: this.month,
-        page: this.listQuery.page-1,
+        page: this.listQuery.page - 1,
         size: this.listQuery.limit,
         eq_state: this.listQuery.state,
       })

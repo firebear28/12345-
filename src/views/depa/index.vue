@@ -2,22 +2,28 @@
   <div class="app-container">
     <div class="filter-container">
       <div class="filter-items">
-        <span>主部门：</span>
+        <span>主部门名称：</span>
         <el-input v-model="listQuery.like_departName" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
       </div>
       <div class="filter-items">
-        <span>子部门：</span>
+        <span>名称：</span>
         <el-input v-model="listQuery.like_subDepartName" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
       </div>
       <div class="filter-items">
-        <span>子系统：</span>
+        <span>来源：</span>
         <el-select v-model="listQuery.eq_subId" placeholder="请选择" clearable style="width: 100%" class="filter-item" @change="handleFilter">
           <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
         </el-select>
       </div>
       <div class="filter-items">
+        <span>状态：</span>
+        <el-select v-model="listQuery.null_departId" placeholder="请选择" clearable style="width: 100%" class="filter-item" @change="handleFilter">
+          <el-option v-for="item in departOptions" :key="item.key" :label="item.label" :value="item.key"/>
+        </el-select>
+      </div>
+      <div class="filter-items">
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
-        <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button>
+        <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button> -->
         <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
       </div>
     </div>
@@ -30,10 +36,12 @@
       highlight-current-row
       style="width: 100%;">
       <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
-      <el-table-column label="主部门" prop="departName" min-width="200"/>
-      <el-table-column label="上级部门" prop="rootDepartName" align="center" min-width="135"/>
-      <el-table-column label="子系统部门" prop="subDepartName" min-width="200"/>
-      <el-table-column label="子系统上级部门" prop="subRootDepartName" align="center" min-width="150"/>
+      <el-table-column label="编码" prop="subDepartId" min-width="150"/>
+      <el-table-column label="名称" prop="subDepartName" min-width="200"/>
+      <el-table-column label="来源" prop="subName" align="center" min-width="100"/>
+      <el-table-column label="主部门编码" prop="departId" min-width="150"/>
+      <el-table-column label="主部门名称" prop="departName" min-width="200"/>
+      <el-table-column label="状态" prop="state" align="center" min-width="150"/>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
@@ -86,12 +94,6 @@ import { request, post } from '@/utils/req.js'
 import { obj2formdatastr } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
-
-const sortOptions = [
-  { key: 'HL', label: '热线' },
-  { key: 'ZW', label: '智网' }
-]
-
 export default {
   name: 'ComplexTable',
   components: { Pagination },
@@ -106,10 +108,18 @@ export default {
         like_departName: '',
         like_subDepartName: '',
         eq_subId: '',
-        page: 0,
+        null_departId: '',
+        page: 1,
         limit: 10
       },
-      sortOptions,
+      sortOptions: [
+        { key: 'HL', label: '热线' },
+        { key: 'ZW', label: '智网' }
+      ],
+      departOptions: [
+        { key: false, label: '已识别' },
+        { key: true, label: '未识别' }
+      ],
       statusOptions: ['published', 'draft', 'deleted'],
       temp: {
         id: '',
@@ -141,8 +151,12 @@ export default {
     getList() {
       this.listLoading = true
       const params = obj2formdatastr({
-        page: this.listQuery.page,
-        size: this.listQuery.limit
+        page: this.listQuery.page - 1,
+        size: this.listQuery.limit,
+        like_departName: this.listQuery.like_departName,
+        like_subDepartName: this.listQuery.like_subDepartName,
+        eq_subId: this.listQuery.eq_subId,
+        null_departId: this.listQuery.null_departId,
       })
       request('/sg/department/sgMainDepartment/search?' + params).then(data => {
         this.list = data.rows
@@ -162,22 +176,8 @@ export default {
       this.$router.push({ path: '/' + this.listQuery.type + '/index' })
     },
     handleFilter() {
-      const params = obj2formdatastr({
-        like_departName: this.listQuery.like_departName,
-        like_subDepartName: this.listQuery.like_subDepartName,
-        eq_subId: this.listQuery.eq_subId,
-        size: this.listQuery.limit
-      })
-      request('/sg/department/sgMainDepartment/search?' + params).then(data => {
-        // this.list = []
-        this.list = data.rows
-        this.listQuery.page = 0
-        this.total = data.total
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 0.5 * 1000)
-      })
+      this.listQuery.page = 1
+      this.getList()
     },
     handleModifyStatus(row, status) {
       this.$confirm('此操作将永久删除, 是否继续?', '提示', {
@@ -228,31 +228,42 @@ export default {
         }
       })
     },
+    // 点击编辑
     handleUpdate(row) {
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
-      // request('/sg/department/sgMainDepartment/' + row.id).then(request => {
-      //   this.temp = request.data
-      // })
       this.temp = Object.assign({}, row) // copy obj
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
     },
+    // 提交编辑
     updateData() {
-      this.temp.isNew = false
-      const params = obj2formdatastr(this.temp)
+      const params = {
+        id: this.temp.id,
+        departId: this.temp.departId,
+        departName: this.temp.departName,
+      }
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          post('/sg/department/sgMainDepartment?' + params).then(data => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
+          post('/sg/department/sgMainDepartment', params).then(data => {
+            if(data.code === 200){
+              this.dialogFormVisible = false
+              this.$notify({
+                title: '成功',
+                message: '更新成功',
+                type: 'success',
+                duration: 2000
+              })
+            }else{
+              this.$notify({
+                title: '错误',
+                message: data.message,
+                type: 'error',
+                duration: 2000
+              })
+            }
+            this.getList()
           })
         }
       })
@@ -272,7 +283,7 @@ export default {
       this.downloadLoading = true
       const params = obj2formdatastr({
         month: '201812',
-        pageNumber: this.listQuery.page,
+        pageNumber: this.listQuery.page - 1,
         pageSize: this.listQuery.limit,
         state: this.listQuery.state,
         property: 'acceptTime',

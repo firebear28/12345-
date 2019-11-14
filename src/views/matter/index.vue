@@ -122,7 +122,7 @@ export default {
       listLoading: true,
       listQuery: {
         id: '',
-        page: 0,
+        page: 1,
         limit: 10,
         importance: undefined,
         title: undefined,
@@ -161,7 +161,7 @@ export default {
     getList() {
       this.listLoading = true
       const params = obj2formdatastr({
-        page: this.listQuery.page,
+        page: this.listQuery.page - 1,
         size: this.listQuery.limit
       })
       request('/sg/twoconitem/findByPage?' + params).then(data => {

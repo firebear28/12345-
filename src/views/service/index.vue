@@ -83,7 +83,7 @@ export default {
       listLoading: true,
       listQuery: {
         account: 'dgdp',
-        page: 0,
+        page: 1,
         limit: 10,
       },
       statusOptions: ['published', 'draft', 'deleted'],
@@ -119,8 +119,8 @@ export default {
     getList() {
       this.listLoading = true
       const params = obj2formdatastr({
-        account: 'dgdp',
-        page: this.listQuery.page,
+        account: this.listQuery.account,
+        page: this.listQuery.page - 1,
         size: this.listQuery.limit
       })
       request('/sg/base/logApiRequest/findByAccount?' + params).then(data => {
@@ -141,21 +141,8 @@ export default {
       this.$router.push({ path: '/' + this.listQuery.type + '/index' })
     },
     handleFilter() {
-      this.listLoading = true
-      const params = obj2formdatastr({
-        account: this.listQuery.account,
-        page: this.listQuery.page,
-        size: this.listQuery.limit
-      })
-      request('/sg/base/logApiRequest/findByAccount?' + params).then(data => {
-        this.list = data.content
-        this.total = data.totalElements
-
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 0.5 * 1000)
-      })
+      this.listQuery.page = 1
+      this.getList()
     },
     handleModifyStatus(row, status) {
       this.$message({
