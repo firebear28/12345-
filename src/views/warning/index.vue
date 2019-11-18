@@ -21,12 +21,12 @@
       <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
       <el-table-column label="部门" prop="departName" min-width="200"/>
       <el-table-column label="逾期数预警值" prop="cardAlarm" width="200"/>
-      <el-table-column label="总数预警值" prop="countAlarm" min-width="200"/>
+      <el-table-column label="总数预警值" prop="countAlarm" min-width="100"/>
       <el-table-column label="办结率预警值" prop="doneAlarm" width="200"/>
       <el-table-column label="满意度预警值" prop="satisfyAlarm" width="250"/>
-      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="100" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
+          <!-- <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button> -->
           <el-button size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">删除
           </el-button>
         </template>

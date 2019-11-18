@@ -1,6 +1,8 @@
 import axios from 'axios'
 // import store from '../store'
 import { getToken, getUserAgent } from '@/utils/auth' // getToken from cookie
+import store from '@/store'
+import { Message } from 'element-ui'
 
 // 请求队列
 let pending = []
@@ -49,6 +51,19 @@ axios.interceptors.request.use(config => {
 
 // 响应拦截器
 axios.interceptors.response.use(res => {
+  // 如果token过期，则如下操作
+  const url = res.request.responseURL
+  const response = JSON.parse(res.request.response)
+  if(~url.indexOf('admin/user/sysUser') && response.code === 20020){
+    Message({
+      message: '会话失效，请重新登陆',
+      type: 'error'
+    })
+    // 跳转到登陆页面重新登陆
+    store.dispatch('LogOut').then(() => {
+      location.reload()   // reload() 方法类似于你浏览器上的刷新页面按钮
+    })
+  }
   // 成功响应之后清空队列中所有相同Url的请求
   pending = pending.filter(_ => _.url != getPureUrl(res.config.url, res.config.baseURL.length))
   // 返回 response

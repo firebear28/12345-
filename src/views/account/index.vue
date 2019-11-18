@@ -2,13 +2,8 @@
   <div class="app-container">
     <div class="filter-container">
       <div class="filter-items">
-        <span>ID查询：</span>
-        <el-input
-          v-model="listQuery.id"
-          placeholder="请输入订单编号"
-          class="filter-item"
-          @keyup.enter.native="handleFilter"
-        />
+        <span>用户账号：</span>
+        <el-input v-model="listQuery.account" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter" />
       </div>
       <div class="filter-items">
         <el-button
@@ -162,14 +157,9 @@ export default {
       ipLoading: true,
       createIP: '',
       listQuery: {
-        id: '',
-        page: 0,
+        account: '',
+        page: 1,
         limit: 10,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
-        state: '',
-        sort: '+id'
       },
       statusOptions: ['published', 'draft', 'deleted'],
       temp: {
@@ -241,11 +231,18 @@ export default {
         }
       })
         .then(data => {
-          this.$message({
-            message: '新建成功',
-            type: 'success'
-          })
-          this.grtIP(this.temp)
+          if(data.code === 200){
+            this.$message({
+              message: '新建成功',
+              type: 'success'
+            })
+            this.grtIP(this.temp)
+          }else{
+            this.$message({
+              message: data.message,
+              type: 'error'
+            })
+          }
         })
         .catch(() => {
           this.$message({
@@ -256,22 +253,14 @@ export default {
     },
     getList() {
       this.listLoading = true
-      request(
-        `/admin/user/sysUser/search?size=${this.listQuery.limit}&page=${this.listQuery.page -1}`
-      ).then(data => {
-        if(data.code === 20020){
-          this.$message({
-            message: '会话失效，请重新登陆',
-            type: 'error'
-          })
-          // 跳转到登陆页面重新登陆
-          this.$store.dispatch('LogOut').then(() => {
-            location.reload()   // reload() 方法类似于你浏览器上的刷新页面按钮
-          })
-        }else{
-          this.list = data.rows
-          this.total = data.total
-        }
+      const params = obj2formdatastr({
+        page: this.listQuery.page - 1,
+        size: this.listQuery.limit,
+        eq_account: this.listQuery.account,
+      })
+      request( `/admin/user/sysUser/search?` + params ).then(data => {
+        this.list = data.rows
+        this.total = data.total
 
         // Just to simulate the time of the request
         setTimeout(() => {
@@ -287,16 +276,8 @@ export default {
       this.$router.push({ path: '/' + this.listQuery.type + '/index' })
     },
     handleFilter() {
-      request('/admin/user/sysUser/' + this.listQuery.id).then(data => {
-        this.list = []
-        this.list.push(data)
-        this.listQuery.page = 0
-        this.total = 1
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 0.5 * 1000)
-      })
+      this.listQuery.page = 1
+      this.getList()
     },
     // 删除
     handleModifyStatus(row, status) {

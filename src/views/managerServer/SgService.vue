@@ -11,7 +11,7 @@
       </div>
       <div class="filter-items">
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
-        <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button> -->
+        <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button>
         <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
       </div>
     </div>
@@ -42,15 +42,24 @@
     <pagination :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px" style="width: 450px; margin-left:50px;">
-        <el-form-item label="主键" prop="bid">
-          <el-input v-model="temp.bid"/>
+      <el-form ref="dataForm" class="dataForm" :rules="rules" :model="temp" label-position="left" label-width="160px">
+        <el-form-item label="所属模块" prop="module">
+          <el-input v-model="temp.module"/>
         </el-form-item>
-        <el-form-item label="网站地址" prop="address">
-          <el-input v-model="temp.address"/>
+        <el-form-item label="服务名称" prop="serviceName">
+          <el-input v-model="temp.serviceName"/>
         </el-form-item>
-        <el-form-item label="网站名称" prop="webName">
-          <el-input v-model="temp.webName"/>
+        <el-form-item label="接口地址" prop="serviceUrl">
+          <el-input v-model="temp.serviceUrl"/>
+        </el-form-item>
+        <el-form-item label="请求方法(GET/POST)" prop="method">
+          <el-input v-model="temp.method"/>
+        </el-form-item>
+        <el-form-item label="接入参数" prop="accessParams">
+          <el-input v-model="temp.accessParams"/>
+        </el-form-item>
+        <el-form-item label="返回参数" prop="returnParams">
+          <el-input v-model="temp.returnParams"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -116,7 +125,7 @@ export default {
       listLoading: true,
       listQuery: {
         serviceName: '',
-        page: 0,
+        page: 1,
         limit: 10,
       },
       sortOptions,
@@ -149,7 +158,7 @@ export default {
       this.listLoading = true
       const params = obj2formdatastr({
         serviceName: this.listQuery.serviceName,
-        page: this.listQuery.page,
+        page: this.listQuery.page - 1,
         size: this.listQuery.limit
       })
       request('sg/base/sgService/queryByPage?' + params).then(data => {
@@ -166,8 +175,7 @@ export default {
       return (index + 1) + 10 * (this.listQuery.page - 1)
     },
     handleFilter() {
-      this.listQuery.page = 0
-      this.listQuery.limit = 10
+      this.listQuery.page = 1
       this.getList()
     },
     handleModifyStatus(row, status) {
@@ -205,21 +213,37 @@ export default {
       })
     },
     createData() {
-      const params = obj2formdatastr(this.temp)
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          post('/sg/item/sgSentimentAddress/add?' + params).then(data => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
-          })
+      request(`/sg/base/sgService`, {
+        method: 'post',
+        data: {
+          module: this.temp.module,
+          serviceName: this.temp.serviceName,
+          serviceUrl: this.temp.serviceUrl,
+          method: this.temp.method,
+          accessParams: this.temp.accessParams,
+          returnParams: this.temp.returnParams,
         }
       })
+        .then(data => {
+          if(data.code === 200){
+            this.$message({
+              message: '新增成功',
+              type: 'success'
+            })
+            this.getList()
+          }else{
+            this.$message({
+              message: data.message,
+              type: 'error'
+            })
+          }
+        })
+        .catch(() => {
+          this.$message({
+            message: '新增失败',
+            type: 'error'
+          })
+        })
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj

@@ -16,7 +16,7 @@ export const obj2formdatastr = (body) => {
 }
 
 /**
- * 最简单且最安全的方法显示一个值，举个例子:
+ * 最简单且最安全的方法显示一个值，举个例子: 
  * var obj = {a: 123 }
    maybe(_=> obj.a, 0); // 123
    maybe(_=> obj.b, 0); // 0
@@ -24,9 +24,9 @@ export const obj2formdatastr = (body) => {
  */
 export const maybe = (fn, n = '') => {
   try {
-    const result = fn()
-    return (result && result === result && result !== 'NaN' && result !== 'undefined' && result !== 'Invalid date') ? result : n
+      const result = fn()
+      return (result && result === result && result !== 'NaN' && result !== 'undefined' && result !== 'Invalid date') ? result : n
   } catch (err) {
-    return n
+      return n
   }
 }
