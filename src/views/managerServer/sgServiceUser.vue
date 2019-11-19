@@ -41,8 +41,18 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" class="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px">
-        <SelectScroll ref="selectServer" idName="服务ID" name="服务名称" url="sg/base/sgService/queryByPage?" rows="content" objkey="serviceId" objname="serviceName" total="totalElements" emit="setServer" @setServer="setServer"/>
-        <SelectScroll ref="selectAccount" idName="用户账号" name="用户名称" url="/admin/user/sysUser/search?" rows="rows" objkey="account" objname="fullname" total="total" emit="setAccount" @setAccount="setAccount"/>
+        <el-form-item label="服务ID" prop="subItemName">
+          <SelectScroll ref="selectServer" idName="服务ID" name="服务名称" url="sg/base/sgService/queryByPage?" rows="content" objkey="serviceId" objname="serviceName" total="totalElements" emit="setServer" @setServer="setServer"/>
+        </el-form-item>
+        <el-form-item label="服务名称" prop="subItemName">
+          <span>{{ temp.serviceName }}</span>
+        </el-form-item>
+        <el-form-item label="用户账号" prop="subItemName">
+          <SelectScroll ref="selectAccount" idName="用户账号" name="用户名称" url="/admin/user/sysUser/search?" rows="rows" objkey="account" objname="fullname" total="total" emit="setAccount" @setAccount="setAccount"/>
+        </el-form-item>
+        <el-form-item label="用户名称" prop="subItemName">
+          <span>{{ temp.userFullname }}</span>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
@@ -214,6 +224,7 @@ export default {
     },
     // 服务用户管理——新增
     createData() {
+      return console.log(this.temp)
       request(`/sg/base/sgServiceUser`, {
         method: 'post',
         data: {

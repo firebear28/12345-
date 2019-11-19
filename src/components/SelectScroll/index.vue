@@ -1,37 +1,29 @@
 <template>
-  <div 
-    :idName="idName"
-    :name="name"
-    :url="url"
-    :rows="rows"
-    :objkey="objkey"
-    :objname="objname"
-    :total="total"
-    :emit="emit">
-    <el-form-item :label="idName">
-      <el-select
-        ref="select"
-        v-model="serviceId"
-        placeholder="请选择"
-        clearable
-        filterable
-        :filter-method="filter"
-        :loading="loading"
-        @change="change"
-        style="width: 100%"
-      >
-        <el-option
-          v-for="(item,i) in options"
-          :key="i"
-          :label="item[objkey]"
-          :value="item[objkey]"
-        />
-      </el-select>
-    </el-form-item>
-    <el-form-item :label="name" v-if="name">
-      <span>{{ serviceName }}</span>
-    </el-form-item>
-  </div>
+    <el-select
+      ref="select"
+      v-model="serviceId"
+      placeholder="请选择"
+      clearable
+      filterable
+      :filter-method="filter"
+      :loading="loading"
+      @change="change"
+      @clear="clear"
+      style="width: 100%"
+      :url="url"
+      :rows="rows"
+      :objkey="objkey"
+      :objname="objname"
+      :total="total"
+      :emit="emit"
+    >
+      <el-option
+        v-for="(item,i) in options"
+        :key="i"
+        :label="item[objkey]"
+        :value="item[objkey]"
+      />
+    </el-select>
 </template>
 
 <script>
@@ -40,14 +32,12 @@ import { request } from '@/utils/req.js'
 
 export default {
   props: {
-    idName: "",
-    name: "",
-    url: "", // eslint-disable-line
-    rows: '',
-    total: '',
-    objkey: '',
-    objname: '',
-    emit: '',
+    url: "",          // eslint-disable-line
+    rows: '',         // 内容的key
+    total: '',        // 页数的key
+    objkey: '',       // options中对象的key
+    objname: '',      // options中对象的name
+    emit: '',         // 传给父组件的方法名
   },
   data() {
     return {
@@ -66,6 +56,7 @@ export default {
   watch: {
   },
   methods: {
+    // 搜索的逻辑
     filter(v) {
       // 当清空选中值时，清空
       if(v === '') this.serviceName = ''
@@ -94,8 +85,26 @@ export default {
       }
     },
     change(v) {
-      // 给父组件传值
-      this.$emit(this.emit, v)
+      // 当清空选中值时，清空
+      if(v === '') this.serviceName = ''
+      // 当存在第二对不可修改的对应的参数时
+      if(this.objname){
+        let obj = {}
+        obj[this.objkey] = ''
+        obj[this.objname] = ''
+        for( var i of this.options){
+          // 如果有相对应的值
+          if(i[this.objkey] === v){
+            obj[this.objkey] = v
+            obj[this.objname] = i[this.objname]
+          }
+        }
+        // 给父组件传值————对象
+        this.$emit(this.emit, obj)
+      }else{
+        // 给父组件传值
+        this.$emit(this.emit, v)
+      }
     },
     // 获取服务注册列表
     getList(query, key) {
