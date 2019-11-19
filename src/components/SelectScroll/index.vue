@@ -15,18 +15,20 @@
         placeholder="请选择"
         clearable
         filterable
+        :filter-method="filter"
+        :loading="loading"
         @change="change"
         style="width: 100%"
       >
         <el-option
-          v-for="item in serviceList"
-          :key="item[objkey]"
+          v-for="(item,i) in options"
+          :key="i"
           :label="item[objkey]"
           :value="item[objkey]"
         />
       </el-select>
     </el-form-item>
-    <el-form-item :label="name">
+    <el-form-item :label="name" v-if="name">
       <span>{{ serviceName }}</span>
     </el-form-item>
   </div>
@@ -45,11 +47,11 @@ export default {
     total: '',
     objkey: '',
     objname: '',
-    emit: ''
+    emit: '',
   },
   data() {
     return {
-      serviceList: [],
+      options: [],
       serviceId: '',
       serviceName: '',
       page: -1,
@@ -60,41 +62,59 @@ export default {
     };
   },
   computed: {
-    disabled () {
-      return this.loading
-    }
+  },
+  watch: {
   },
   methods: {
+    filter(v) {
+      // 当清空选中值时，清空
+      if(v === '') this.serviceName = ''
+      // 当存在第二对不可修改的对应的参数时
+      if(this.name){
+        for( var i of this.options){
+          // 如果有相对应的值
+          if(i[this.objkey] === v){
+            this.serviceName = i[this.objname]
+            let obj = {}
+            obj[this.objkey] = v
+            obj[this.objname] = this.serviceName
+            this.$emit(this.emit, obj)
+          }
+        }
+      }else{
+        const length = this.options.filter(i=>i.itemName === v).length
+        if(!length){
+            let __SCROLLTIMER__ = null
+            clearTimeout(__SCROLLTIMER__);
+            __SCROLLTIMER__ = setTimeout(_ => this.getList(v, 'like_ItemName'), 500);
+        }
+        console.log(v)
+        // 给父组件传值
+        this.$emit(this.emit, v)
+      }
+    },
+    change(v) {
+      // 给父组件传值
+      this.$emit(this.emit, v)
+    },
     // 获取服务注册列表
-    getList() {
-      this.loading = false
-      const params = obj2formdatastr({
-        // serviceName: "",
+    getList(query, key) {
+      this.loading = true
+      let params = obj2formdatastr({
         page: this.page += 1,
         size: this.size
       });
+      if(query) params = params+'&'+key+'='+query
+      console.log(params)
       request(this.url + params).then(data => {
-        this.loading = true
+        this.loading = false
         if(this.maybe(_=>data[this.rows].length, false)){
           this.totalElements = data[this.total]
           for( var i of data[this.rows]){
-            this.serviceList.push(i);
+            this.options.push(i);
           }
         }
       });
-    },
-    change(v) {
-      if(v === '') return this.serviceName = ''
-      for( var i of this.serviceList){
-        if(i[this.objkey] === v){
-          this.serviceName = i[this.objname]
-          let obj = {}
-          obj[this.objkey] = v
-          obj[this.objname] = this.serviceName
-          this.$emit(this.emit, obj)
-        }
-      }
-      // setTimeout(_ => this.serviceId = '', 1500);
     },
     // 下拉到底部的时候，触发的函数，会自动加载数据
     loadData (e) {

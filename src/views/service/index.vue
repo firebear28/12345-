@@ -235,10 +235,10 @@ export default {
       this.downloadLoading = true
       const params = obj2formdatastr({
         account: this.listQuery.account,
-        page: this.listQuery.page,
+        page: this.listQuery.page - 1,
         size: this.listQuery.limit
       })
-      window.location.href = 'http://12345v2.dgdatav.com:6080/api/sg/base/logApiRequest/export?' + params
+      window.location.href = 'http://19.104.40.37:8082/api/sg/base/logApiRequest/export?' + params
       this.downloadLoading = false
     },
   }

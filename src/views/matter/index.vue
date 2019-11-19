@@ -11,7 +11,7 @@
       </div>
       <div class="filter-items">
         <span>来源：</span>
-        <el-select v-model="listQuery.eq_subIden" placeholder="请选择" clearable style="width: 100%" class="filter-item" @change="changeTopics">
+        <el-select v-model="listQuery.eq_subIden" placeholder="请选择" clearable style="width: 100%" class="filter-item" @change="handleFilter">
           <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
         </el-select>
       </div>
@@ -52,16 +52,14 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" class="dataForm" :rules="rules" :model="temp" label-position="left" label-width="140px">
-        <el-form-item label="事项名称" prop="itemName">
-          <el-input v-model="temp.itemName"/>
-        </el-form-item>
+        <SelectScroll ref="selectServer" idName="主事项名称" url="sg/twoconitem/getDistinctItem?" rows="rows" objkey="itemName" total="total" emit="setItemName" @setItemName="setItemName"/>
         <el-form-item label="来源" prop="subName">
           <span v-if="dialogStatus === 'update'">{{ temp.subName }}</span>
           <el-select v-else v-model="temp.subName" placeholder="请选择" clearable style="width: 100%">
             <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="主事项名称" prop="subItemName">
+        <el-form-item label="事项名称" prop="subItemName">
           <span>{{ temp.subItemName }}</span>
         </el-form-item>
       </el-form>
@@ -91,6 +89,7 @@ import { parseTime } from '@/utils'
 import { request, post, reqDelete, put } from '@/utils/req.js'
 import { obj2formdatastr } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+import SelectScroll from '@/components/SelectScroll' // 无限滚动下拉组建
 
 const sortOptions = [
   { key: 'HL', label: '热线' },
@@ -99,7 +98,7 @@ const sortOptions = [
 
 export default {
   name: 'ComplexTable',
-  components: { Pagination },
+  components: { SelectScroll, Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -178,9 +177,9 @@ export default {
     indexMethod(index) {
       return (index + 1) + 10 * (this.listQuery.page - 1)
     },
-    changeTopics() {
-      // 路由跳转
-      this.$router.push({ path: '/' + this.listQuery.type + '/index' })
+    setItemName(v) {
+      console.log(v)
+      this.temp.itemName = v
     },
     handleFilter() {
       this.listQuery.page = 1
@@ -248,6 +247,7 @@ export default {
     },
 
     updateData() {
+      return console.log(this.temp)
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
           const params = {
@@ -283,10 +283,12 @@ export default {
     handleDownload() {
       this.downloadLoading = true
       const params = obj2formdatastr({
-        page: this.listQuery.page,
+        page: this.listQuery.page - 1,
         size: this.listQuery.limit
       })
-      window.location.href = 'http://12345v2.dgdatav.com:6080/api/sg/twoconitem/export?' + params
+      // const baseURL = this.$store.getters.baseURL
+      // window.location.href = baseURL + '/sg/twoconitem/export?' + params
+      window.location.href = 'http://19.104.40.37:8082/api/sg/twoconitem/export?' + params
       this.downloadLoading = false
     },
     formatJson(filterVal, jsonData) {

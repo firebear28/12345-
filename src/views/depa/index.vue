@@ -290,7 +290,7 @@ export default {
         direction: 'DESC'
       })
       
-      window.location.href = 'http://12345v2.dgdatav.com:6080/api/sg/citymanagement/export?' + params
+      window.location.href = 'http://19.104.40.37:8082/api/sg/citymanagement/export?' + params
       this.downloadLoading = false
     },
     formatJson(filterVal, jsonData) {

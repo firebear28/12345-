@@ -1,5 +1,4 @@
 import axios from 'axios'
-// import store from '../store'
 import { getToken, getUserAgent } from '@/utils/auth' // getToken from cookie
 import store from '@/store'
 import { Message } from 'element-ui'
@@ -29,7 +28,8 @@ axios.interceptors.request.use(config => {
   config.url = encodeURI(config.url)
   // 设置公共URL http://12345v2.alltosea.com:6080/api
   config.baseURL = process.env.NODE_ENV === 'development' ? 'http://19.104.40.37:8082/api' : '/api'
-
+  // 存入baseURL
+  store.dispatch('setBaseUrl', 'http://19.104.40.37:8082/api')
   // 如果url包含admin/user/sysUser则需要添加tokenid和userAgent
   if (config.url.indexOf('admin/user/sysUser') !== -1) { config.params = { tokenid: getToken(), userAgent: getUserAgent() } }
 
