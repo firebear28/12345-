@@ -2,26 +2,26 @@
   <div class="app-container">
     <div class="filter-container">
       <div class="filter-items">
-        <span>主事项：</span>
-        <el-input v-model="listQuery.itemName" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
+        <span>主事项名称：</span>
+        <el-input v-model="listQuery.like_ItemName" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
       </div>
       <div class="filter-items">
-        <span>上级事项：</span>
-        <el-input v-model="listQuery.like_subDepartName" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
+        <span>名称：</span>
+        <el-input v-model="listQuery.like_subItemName" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
       </div>
       <div class="filter-items">
-        <span>子系统事项：</span>
-        <el-input v-model="listQuery.subIden" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
-      </div>
-      <div class="filter-items">
-        <span>子系统：</span>
-        <el-select v-model="listQuery.subIden" placeholder="请选择" clearable style="width: 100%" class="filter-item" @change="changeTopics">
+        <span>来源：</span>
+        <el-select v-model="listQuery.eq_subIden" placeholder="请选择" clearable style="width: 100%" class="filter-item" @change="changeTopics">
           <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
         </el-select>
       </div>
       <div class="filter-items">
+        <span>状态：</span>
+        <el-input v-model="listQuery.null_itemId" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
+      </div>
+      <div class="filter-items">
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
-        <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button>
+        <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button> -->
         <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
       </div>
     </div>
@@ -55,14 +55,14 @@
         <el-form-item label="事项名称" prop="itemName">
           <el-input v-model="temp.itemName"/>
         </el-form-item>
-        <el-form-item label="系统" prop="subName">
+        <el-form-item label="来源" prop="subName">
           <span v-if="dialogStatus === 'update'">{{ temp.subName }}</span>
           <el-select v-else v-model="temp.subName" placeholder="请选择" clearable style="width: 100%">
             <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="事项部门" prop="itemDepart">
-          <el-input v-model="temp.itemDepart"/>
+        <el-form-item label="主事项名称" prop="subItemName">
+          <span>{{ temp.subItemName }}</span>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -121,22 +121,19 @@ export default {
       total: 0,
       listLoading: true,
       listQuery: {
-        id: '',
         page: 1,
         limit: 10,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
-        state: '',
-        sort: '+id'
+        like_subItemName: '',
+        like_ItemName: '',
+        eq_subIden: '',
+        null_itemId: '',
       },
       sortOptions,
       statusOptions: ['published', 'draft', 'deleted'],
       temp: {
+        mid: '',
         itemId: '',
         itemName: '',
-        subItemName: '',
-        subIden: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -161,8 +158,12 @@ export default {
     getList() {
       this.listLoading = true
       const params = obj2formdatastr({
+        like_subItemName: this.listQuery.like_subItemName,
+        like_ItemName: this.listQuery.like_ItemName,
+        eq_subIden: this.listQuery.eq_subIden,
+        null_itemId: this.listQuery.null_itemId,
         page: this.listQuery.page - 1,
-        size: this.listQuery.limit
+        size: this.listQuery.limit,
       })
       request('/sg/twoconitem/findByPage?' + params).then(data => {
         this.list = data.content
@@ -182,16 +183,8 @@ export default {
       this.$router.push({ path: '/' + this.listQuery.type + '/index' })
     },
     handleFilter() {
-      request('/sg/twoconitem/' + this.listQuery.id).then(data => {
-        this.list = []
-        this.list.push(data)
-        this.listQuery.page = 0
-        this.total = 1
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 0.5 * 1000)
-      })
+      this.listQuery.page = 1
+      this.getList()
     },
     handleModifyStatus(row, status) {
       this.$confirm('此操作将永久删除, 是否继续?', '提示', {
@@ -215,10 +208,9 @@ export default {
     },
     resetTemp() {
       this.temp = {
+        mid: '',
         itemId: '',
         itemName: '',
-        subItemName: '',
-        subIden: ''
       }
     },
     handleCreate() {
@@ -256,18 +248,19 @@ export default {
     },
 
     updateData() {
-      const params = obj2formdatastr(this.temp)
-      this.$refs['dataForm'].validate((valid) => {
+      this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          put('/sg/twoconitem/update?' + params).then(data => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
+          const params = {
+            mid: this.temp.mid,
+            itemId: this.temp.itemId,
+            itemName: this.temp.itemName,
+          }
+          post('/sg/twoconitem/', params).then(data => {
+            if (data.code === 200) {
+              this.getList()
+              this.$message.success('修改成功！')
+              this.dialogFormVisible = false
+            }
           })
         }
       })

@@ -82,7 +82,7 @@ export default {
       total: 0,
       listLoading: true,
       listQuery: {
-        account: 'dgdp',
+        account: '',
         page: 1,
         limit: 10,
       },

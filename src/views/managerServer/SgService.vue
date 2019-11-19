@@ -53,7 +53,14 @@
           <el-input v-model="temp.serviceUrl"/>
         </el-form-item>
         <el-form-item label="请求方法(GET/POST)" prop="method">
-          <el-input v-model="temp.method"/>
+          <el-select v-model="temp.method" placeholder="请选择" style="width: 100%">
+            <el-option
+              v-for="item in sortOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="接入参数" prop="accessParams">
           <el-input v-model="temp.accessParams"/>
@@ -89,15 +96,8 @@ import { obj2formdatastr } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 const sortOptions = [
-  { key: 'city', label: '城市管理' },
-  { key: 'admn', label: '行政效能' },
-  { key: 'envr', label: '环境保护' },
-  { key: 'depa', label: '部门管理' },
-  { key: 'account', label: '账号管理' },
-  { key: 'street', label: '镇街管理' },
-  { key: 'service', label: '集中日志管理' },
-  { key: 'matter', label: '事项管理' },
-  { key: 'public', label: '舆情分析配置' }
+  { value: 'GET', label: 'GET' },
+  { value: 'POST', label: 'POST' },
 ]
 
 export default {

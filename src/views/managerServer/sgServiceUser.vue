@@ -41,18 +41,8 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" class="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px">
-        <el-form-item label="服务ID" prop="serviceId">
-          <SelectScroll url="/admin/user/sysUser/search?" rows="rows" id="userid" total="total"/>
-        </el-form-item>
-        <el-form-item label="服务名称" prop="serviceName">
-          <el-input v-model="temp.serviceName"/>
-        </el-form-item>
-        <el-form-item label="用户账号" prop="userAccount">
-          <el-input v-model="temp.userAccount"/>
-        </el-form-item>
-        <el-form-item label="用户名称" prop="userFullname">
-          <el-input v-model="temp.userFullname"/>
-        </el-form-item>
+        <SelectScroll ref="selectServer" idName="服务ID" name="服务名称" url="sg/base/sgService/queryByPage?" rows="content" objkey="serviceId" objname="serviceName" total="totalElements" emit="setServer" @setServer="setServer"/>
+        <SelectScroll ref="selectAccount" idName="用户账号" name="用户名称" url="/admin/user/sysUser/search?" rows="rows" objkey="account" objname="fullname" total="total" emit="setAccount" @setAccount="setAccount"/>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
@@ -135,6 +125,14 @@ export default {
       serviceList: []
     }
   },
+  watch: {
+    dialogFormVisible(v) {
+      if(v === false){
+        this.$refs.selectServer.clear();
+        this.$refs.selectAccount.clear();
+      }
+    }
+  },
   created() {
     this.getList()
   },
@@ -160,9 +158,13 @@ export default {
     indexMethod(index) {
       return (index + 1) + 10 * (this.listQuery.page - 1)
     },
-    changeTopics() {
-      // 路由跳转
-      this.$router.push({ path: '/' + this.listQuery.type + '/index' })
+    setServer(obj) {
+      this.temp.serviceId = obj.serviceId
+      this.temp.serviceName = obj.serviceName
+    },
+    setAccount(obj) {
+      this.temp.userAccount = obj.account
+      this.temp.userFullname = obj.fullname
     },
     handleFilter() {
       this.listQuery.page = 1
@@ -221,8 +223,7 @@ export default {
           userAccount: this.temp.userAccount,
           userFullname: this.temp.userFullname,
         }
-      })
-        .then(data => {
+      }).then(data => {
           if(data.code === 200){
             this.$message({
               message: '新增成功',
@@ -235,8 +236,7 @@ export default {
               type: 'error'
             })
           }
-        })
-        .catch(() => {
+        }).catch(() => {
           this.$message({
             message: '新增失败',
             type: 'error'
