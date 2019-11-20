@@ -42,6 +42,7 @@ export default {
   data() {
     return {
       options: [],
+      optionBack: [],
       serviceId: '',
       serviceName: '',
       page: -1,
@@ -58,31 +59,24 @@ export default {
   methods: {
     // 搜索的逻辑
     filter(v) {
-      // 当清空选中值时，清空
-      if(v === '') this.serviceName = ''
-      // 当存在第二对不可修改的对应的参数时
-      if(this.name){
-        for( var i of this.options){
-          // 如果有相对应的值
-          if(i[this.objkey] === v){
-            this.serviceName = i[this.objname]
-            let obj = {}
-            obj[this.objkey] = v
-            obj[this.objname] = this.serviceName
-            this.$emit(this.emit, obj)
-          }
-        }
-      }else{
-        const length = this.options.filter(i=>i.itemName === v).length
-        if(!length){
-            let __SCROLLTIMER__ = null
-            clearTimeout(__SCROLLTIMER__);
-            __SCROLLTIMER__ = setTimeout(_ => this.getList(v, 'like_ItemName'), 500);
-        }
-        console.log(v)
+        const $options = JSON.parse(JSON.stringify(this.optionBack))
+        const filter = $options.filter(i=>~String(i.account).indexOf(v))
+        const length = filter.length
+        // 当清空选中值时，清空
+        console.log(filter,v === '')
+        if(v === '') return this.options = $options
+        // if(!length){
+        //     let __SCROLLTIMER__ = null
+        //     clearTimeout(__SCROLLTIMER__);
+        //     __SCROLLTIMER__ = setTimeout(_ => {
+        //       this.page = -1
+        //       this.getList(v, 'eq_account')
+        //     }, 500);
+        // }else{
+          this.options = [{account: "y13609666521",fullname: "刘翥远"},{account: "y13609666521",fullname: "刘翥远"},{account: "y13609666521",fullname: "刘翥远"}]
+        // }
         // 给父组件传值
-        this.$emit(this.emit, v)
-      }
+        // this.$emit(this.emit, v)
     },
     change(v) {
       // 当清空选中值时，清空
@@ -122,6 +116,7 @@ export default {
           for( var i of data[this.rows]){
             this.options.push(i);
           }
+          this.optionBack = this.options
         }
       });
     },
