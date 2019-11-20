@@ -17,7 +17,9 @@
       </div>
       <div class="filter-items">
         <span>状态：</span>
-        <el-input v-model="listQuery.null_itemId" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
+        <el-select v-model="listQuery.null_itemId" placeholder="请选择" clearable style="width: 100%" class="filter-item" @change="handleFilter">
+          <el-option v-for="item in stateOptions" :key="item.key" :label="item.label" :value="item.key"/>
+        </el-select>
       </div>
       <div class="filter-items">
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
@@ -34,7 +36,6 @@
       highlight-current-row
       style="width: 100%;">
       <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
-      <!-- <el-table-column label="事项id" prop="itemId" width="100"/> -->
       <el-table-column label="主事项" prop="itemName" min-width="200"/>
       <el-table-column label="事项类型" prop="itemType" min-width="150"/>
       <el-table-column label="子事项" prop="subItemName" min-width="200"/>
@@ -52,7 +53,9 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" class="dataForm" :rules="rules" :model="temp" label-position="left" label-width="140px">
-        <SelectScroll ref="selectServer" idName="主事项名称" url="sg/twoconitem/getDistinctItem?" rows="rows" objkey="itemName" total="total" emit="setItemName" @setItemName="setItemName"/>
+        <el-form-item label="主事项名称" prop="itemName">
+          <SelectScroll ref="selectItem" url="sg/twoconitem/getDistinctItem?" rows="rows" objkey="itemName" search="like_ItemName" total="total" emit="setItemName" @setItemName="setItemName"/>
+        </el-form-item>
         <el-form-item label="来源" prop="subName">
           <span v-if="dialogStatus === 'update'">{{ temp.subName }}</span>
           <el-select v-else v-model="temp.subName" placeholder="请选择" clearable style="width: 100%">
@@ -127,6 +130,10 @@ export default {
         eq_subIden: '',
         null_itemId: '',
       },
+      stateOptions: [
+        { key: false, label: '已识别' },
+        { key: true, label: '未识别' }
+      ],
       sortOptions,
       statusOptions: ['published', 'draft', 'deleted'],
       temp: {
@@ -150,6 +157,13 @@ export default {
       downloadLoading: false
     }
   },
+  watch: {
+    dialogFormVisible(v) {
+      if(v === false){
+        this.$refs.selectItem.clear();
+      }
+    }
+  },
   created() {
     this.getList()
   },
@@ -164,9 +178,9 @@ export default {
         page: this.listQuery.page - 1,
         size: this.listQuery.limit,
       })
-      request('/sg/twoconitem/findByPage?' + params).then(data => {
-        this.list = data.content
-        this.total = data.totalElements
+      request('/sg/twoconitem/search?' + params).then(data => {
+        this.list = data.rows
+        this.total = data.total
 
         // Just to simulate the time of the request
         setTimeout(() => {
@@ -178,7 +192,7 @@ export default {
       return (index + 1) + 10 * (this.listQuery.page - 1)
     },
     setItemName(v) {
-      console.log(v)
+      // console.log(v)
       this.temp.itemName = v
     },
     handleFilter() {
@@ -247,7 +261,7 @@ export default {
     },
 
     updateData() {
-      return console.log(this.temp)
+      // return console.log(this.temp)
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
           const params = {

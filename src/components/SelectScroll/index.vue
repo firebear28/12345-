@@ -9,17 +9,19 @@
       :loading="loading"
       @change="change"
       @clear="clear"
+      @focus="focus"
       style="width: 100%"
       :url="url"
       :rows="rows"
       :objkey="objkey"
       :objname="objname"
+      :search="search"
       :total="total"
       :emit="emit"
     >
       <el-option
-        v-for="(item,i) in options"
-        :key="i"
+        v-for="(item) in options"
+        :key="item[objkey]"
         :label="item[objkey]"
         :value="item[objkey]"
       />
@@ -37,6 +39,7 @@ export default {
     total: '',        // 页数的key
     objkey: '',       // options中对象的key
     objname: '',      // options中对象的name
+    search: '',       // 下拉搜索的参数名
     emit: '',         // 传给父组件的方法名
   },
   data() {
@@ -60,27 +63,28 @@ export default {
     // 搜索的逻辑
     filter(v) {
         const $options = JSON.parse(JSON.stringify(this.optionBack))
-        const filter = $options.filter(i=>~String(i.account).indexOf(v))
+        const filter = $options.filter(i=>~String(i[this.objkey]).indexOf(v))
         const length = filter.length
-        // 当清空选中值时，清空
-        console.log(filter,v === '')
+        // 当清空选中值时，还原下拉框
         if(v === '') return this.options = $options
-        // if(!length){
-        //     let __SCROLLTIMER__ = null
-        //     clearTimeout(__SCROLLTIMER__);
-        //     __SCROLLTIMER__ = setTimeout(_ => {
-        //       this.page = -1
-        //       this.getList(v, 'eq_account')
-        //     }, 500);
-        // }else{
-          this.options = [{account: "y13609666521",fullname: "刘翥远"},{account: "y13609666521",fullname: "刘翥远"},{account: "y13609666521",fullname: "刘翥远"}]
-        // }
-        // 给父组件传值
-        // this.$emit(this.emit, v)
+        if(!length){
+            this.loading = true
+            let __SCROLLTIMER__ = null
+            clearTimeout(__SCROLLTIMER__);
+            __SCROLLTIMER__ = setTimeout(_ => {
+              this.page = -1
+              this.getList(v, this.search)
+            }, 500);
+        }else{
+          this.options = filter
+        }
     },
     change(v) {
       // 当清空选中值时，清空
-      if(v === '') this.serviceName = ''
+      if(v === '') {
+        this.serviceName = ''
+        // this.options = this.optionBack
+      }
       // 当存在第二对不可修改的对应的参数时
       if(this.objname){
         let obj = {}
@@ -108,15 +112,19 @@ export default {
         size: this.size
       });
       if(query) params = params+'&'+key+'='+query
-      console.log(params)
+      // console.log(params)
       request(this.url + params).then(data => {
         this.loading = false
         if(this.maybe(_=>data[this.rows].length, false)){
           this.totalElements = data[this.total]
-          for( var i of data[this.rows]){
-            this.options.push(i);
+          if(!query) {
+            this.options.push(...data[this.rows])
+            this.optionBack = this.options
+          }else{
+            this.options = data[this.rows]
           }
-          this.optionBack = this.options
+        }else{
+          this.options = []
         }
       });
     },
@@ -143,6 +151,10 @@ export default {
     clear() {
       this.serviceId = ''
       this.serviceName = ''
+      this.options = this.optionBack
+    },
+    focus() {
+      this.options = this.optionBack
     }
   },
   created() {

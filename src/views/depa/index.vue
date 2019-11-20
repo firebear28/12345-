@@ -18,7 +18,7 @@
       <div class="filter-items">
         <span>状态：</span>
         <el-select v-model="listQuery.null_departId" placeholder="请选择" clearable style="width: 100%" class="filter-item" @change="handleFilter">
-          <el-option v-for="item in departOptions" :key="item.key" :label="item.label" :value="item.key"/>
+          <el-option v-for="item in stateOptions" :key="item.key" :label="item.label" :value="item.key"/>
         </el-select>
       </div>
       <div class="filter-items">
@@ -56,7 +56,7 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" class="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px">
         <el-form-item label="主部门：" prop="departName">
-          <el-input v-model="temp.departName"/>
+          <SelectScroll ref="selectDepa" url="sg/department/sgMainDepartment/searchDistinctDepart?" rows="rows" objkey="departName" search="like_departName" total="total" emit="setItemName" @setItemName="setItemName"/>
         </el-form-item>
         <el-form-item label="系统：" prop="subName">
           <span v-if="dialogStatus === 'update'">{{ temp.subName }}</span>
@@ -93,10 +93,11 @@ import { parseTime } from '@/utils'
 import { request, post } from '@/utils/req.js'
 import { obj2formdatastr } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+import SelectScroll from '@/components/SelectScroll' // 无限滚动下拉组建
 
 export default {
   name: 'ComplexTable',
-  components: { Pagination },
+  components: { Pagination, SelectScroll },
   directives: { waves },
   data() {
     return {
@@ -116,7 +117,7 @@ export default {
         { key: 'HL', label: '热线' },
         { key: 'ZW', label: '智网' }
       ],
-      departOptions: [
+      stateOptions: [
         { key: false, label: '已识别' },
         { key: true, label: '未识别' }
       ],
@@ -142,6 +143,13 @@ export default {
         // title: [{ required: true, message: 'title is required', trigger: 'blur' }]
       },
       downloadLoading: false
+    }
+  },
+  watch: {
+    dialogFormVisible(v) {
+      if(v === false){
+        this.$refs.selectDepa.clear();
+      }
     }
   },
   created() {
@@ -171,9 +179,9 @@ export default {
     indexMethod(index) {
       return (index + 1) + 10 * (this.listQuery.page - 1)
     },
-    changeTopics() {
-      // 路由跳转
-      this.$router.push({ path: '/' + this.listQuery.type + '/index' })
+    setItemName(v) {
+      // console.log(v)
+      this.temp.departName = v
     },
     handleFilter() {
       this.listQuery.page = 1
@@ -239,6 +247,7 @@ export default {
     },
     // 提交编辑
     updateData() {
+      // return console.log(this.temp)
       const params = {
         id: this.temp.id,
         departId: this.temp.departId,

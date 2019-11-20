@@ -184,7 +184,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-      reqDelete('/sg/base/sgService//deleteSgService/' + row.serviceId).then(data => {
+      post('/sg/base/sgService//deleteSgService/' + row.serviceId).then(data => {
         this.$notify({
           title: '成功',
           message: '删除成功',
@@ -231,6 +231,7 @@ export default {
               type: 'success'
             })
             this.getList()
+            this.dialogFormVisible = false
           }else{
             this.$message({
               message: data.message,

@@ -51,11 +51,11 @@
       <el-table-column label="登陆账号" prop="account" width="200" />
       <el-table-column label="邮件" prop="email" min-width="200" />
       <el-table-column label="手机号" prop="mobile" align="center" width="220" />
-      <el-table-column label="操作" align="center" width="260" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="warning" size="mini" @click="grtIP(scope.row)">IP管理</el-button>
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="handleModifyStatus(scope.row,'delete')">删除</el-button>
+          <!-- <el-button size="mini" type="danger" @click="handleModifyStatus(scope.row,'delete')">删除</el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -72,15 +72,15 @@
         <el-form-item label="名称" prop="fullname">
           <el-input v-model="temp.fullname" />
         </el-form-item>
-        <el-form-item label="账号类型" prop="accounttype">
+        <!-- <el-form-item label="账号类型" prop="accounttype">
           <el-input v-model="temp.accounttype" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="登录账号" prop="account">
           <el-input v-model="temp.account" />
         </el-form-item>
-        <el-form-item label="密码" prop="password">
+        <!-- <el-form-item label="密码" prop="password">
           <el-input v-model="temp.password" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="邮件" prop="email">
           <el-input v-model="temp.email" />
         </el-form-item>
@@ -324,18 +324,26 @@ export default {
       })
     },
     createData() {
-      const params = obj2formdatastr(this.temp)
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          post('/admin/user/sysUser?' + params).then(data => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
+          const data = {
+            isNew: true,
+            userid: this.temp.userid,
+            account: this.temp.account,
+            fullname: this.temp.fullname,
+            email: this.temp.email,
+            mobile: this.temp.mobile,
+          }
+          const params = obj2formdatastr(data)
+          post(`/admin/user/sysUser?` + params).then(data => {
             this.$notify({
               title: '成功',
               message: '创建成功',
               type: 'success',
               duration: 2000
             })
+            this.getList()
+            this.dialogFormVisible = false
           })
         }
       })
@@ -349,12 +357,18 @@ export default {
       })
     },
     updateData() {
-      this.temp.isNew = false
-      const params = obj2formdatastr(this.temp)
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          post('/admin/user/sysUser?' + params).then(data => {
-            this.dialogFormVisible = false
+          const data = {
+            isNew: false,
+            userid: this.temp.userid,
+            account: this.temp.account,
+            fullname: this.temp.fullname,
+            email: this.temp.email,
+            mobile: this.temp.mobile,
+          }
+          const params = obj2formdatastr(data)
+          post(`/admin/user/sysUser?` + params).then(data => {
             this.$notify({
               title: '成功',
               message: '更新成功',
@@ -362,6 +376,7 @@ export default {
               duration: 2000
             })
             this.getList()
+            this.dialogFormVisible = false
           })
         }
       })
