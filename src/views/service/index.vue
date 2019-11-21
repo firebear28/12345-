@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="filter-container">
       <div class="filter-items">
-        <span>登陆账号：</span>
+        <span>登录账号：</span>
         <el-input v-model="listQuery.account" placeholder="请输入" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       </div>
       <div class="filter-items">
@@ -19,7 +19,7 @@
       highlight-current-row
       style="width: 100%;">
       <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
-      <el-table-column label="登陆账号" prop="account" width="100"/>
+      <el-table-column label="登录账号" prop="account" width="100"/>
       <el-table-column label="调用方IP" prop="clientIp" width="130"/>
       <el-table-column label="调用标识" prop="requestIden" min-width="200"/>
       <el-table-column label="请求时间" prop="requestTime" width="160"/>

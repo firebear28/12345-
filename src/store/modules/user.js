@@ -67,10 +67,10 @@ const user = {
           setToken(data.user.tokenId)
           setUserAgent(data.user.userAgent)
         } else {
-          Message.error('登陆失败：' + data.message)
+          Message.error('登录失败：' + data.message)
         }
       }).catch(error => {
-        Message.error('登陆失败')
+        Message.error('登录失败')
         console.log('error submit!!')
       })
     },

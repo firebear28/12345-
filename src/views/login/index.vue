@@ -1,6 +1,6 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" class="login-form" auto-complete="on" label-position="left">
+    <el-form ref="loginForm" :model="loginForm" :rules="rules" class="login-form" auto-complete="on" label-position="left">
       <div class="title-container">
         <h3 class="title">
           {{ $t('login.title') }}
@@ -62,7 +62,11 @@ export default {
     return {
       loginForm: {
         username: 'dgdp',
-        password: 'ch#ks!690'
+        password: ''
+      },
+      rules: {
+        username: [{ required: true, message: '用户名不能为空', trigger: 'blur' }],
+        password: [{ required: true, message: '密码不能为空', trigger: 'blur' }],
       },
       passwordType: 'password',
       loading: false,

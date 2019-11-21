@@ -2,8 +2,12 @@
   <div class="app-container">
     <div class="filter-container">
       <div class="filter-items">
-        <span>用户账号：</span>
+        <span>登录账号：</span>
         <el-input v-model="listQuery.account" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter" />
+      </div>
+      <div class="filter-items">
+        <span>名称：</span>
+        <el-input v-model="listQuery.fullname" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter" />
       </div>
       <div class="filter-items">
         <el-button
@@ -47,10 +51,10 @@
         align="center"
         width="75"
       />
-      <el-table-column label="名称" prop="fullname" width="120" />
-      <el-table-column label="登陆账号" prop="account" width="200" />
-      <el-table-column label="邮件" prop="email" min-width="200" />
-      <el-table-column label="手机号" prop="mobile" align="center" width="220" />
+      <el-table-column label="名称" prop="fullname" min-width="120" />
+      <el-table-column label="登录账号" prop="account" min-width="200" />
+      <!-- <el-table-column label="邮件" prop="email" min-width="200" /> -->
+      <el-table-column label="手机号" prop="mobile" min-width="220" />
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="warning" size="mini" @click="grtIP(scope.row)">IP管理</el-button>
@@ -81,9 +85,9 @@
         <!-- <el-form-item label="密码" prop="password">
           <el-input v-model="temp.password" />
         </el-form-item> -->
-        <el-form-item label="邮件" prop="email">
+        <!-- <el-form-item label="邮件" prop="email">
           <el-input v-model="temp.email" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="手机号" prop="mobile">
           <el-input v-model="temp.mobile" />
         </el-form-item>
@@ -158,6 +162,7 @@ export default {
       createIP: '',
       listQuery: {
         account: '',
+        fullname: '',
         page: 1,
         limit: 10,
       },
@@ -183,9 +188,9 @@ export default {
       },
       pvData: [],
       rules: {
-        // type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        // timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        // title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        fullname: [{ required: true, message: '名称不能为空', trigger: 'blur' }],
+        account: [{ required: true, message: '账号不能为空', trigger: 'blur' }],
+        mobile: [{ required: true, message: '手机号不能为空', trigger: 'blur' }]
       },
       downloadLoading: false
     }
@@ -256,7 +261,8 @@ export default {
       const params = obj2formdatastr({
         page: this.listQuery.page - 1,
         size: this.listQuery.limit,
-        eq_account: this.listQuery.account,
+        like_account: this.listQuery.account,
+        like_fullname: this.listQuery.fullname,
       })
       request( `/admin/user/sysUser/search?` + params ).then(data => {
         this.list = data.rows

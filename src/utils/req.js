@@ -56,10 +56,10 @@ axios.interceptors.response.use(res => {
   const response = JSON.parse(res.request.response)
   if(~url.indexOf('admin/user/sysUser') && response.code === 20020){
     Message({
-      message: '会话失效，请重新登陆',
+      message: '会话失效，请重新登录',
       type: 'error'
     })
-    // 跳转到登陆页面重新登陆
+    // 跳转到登录页面重新登录
     store.dispatch('LogOut').then(() => {
       location.reload()   // reload() 方法类似于你浏览器上的刷新页面按钮
     })

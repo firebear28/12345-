@@ -36,10 +36,11 @@
       highlight-current-row
       style="width: 100%;">
       <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
-      <el-table-column label="主事项" prop="itemName" min-width="200"/>
-      <el-table-column label="事项类型" prop="itemType" min-width="150"/>
-      <el-table-column label="子事项" prop="subItemName" min-width="200"/>
-      <el-table-column label="子系统" prop="subName" align="center" width="150"/>
+      <el-table-column label="主事项名称" prop="itemName" min-width="200"/>
+      <el-table-column label="事项类型" prop="itemType" min-width="100"/>
+      <el-table-column label="名称" prop="subItemName" min-width="200"/>
+      <el-table-column label="来源" prop="subName" align="center" width="150"/>
+      <el-table-column label="状态" prop="state" align="center" width="150"/>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
