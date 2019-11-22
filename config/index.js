@@ -9,7 +9,21 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    // 代理服务器
+    proxyTable: {
+      '/api': {
+        // 我要请求的地址
+        // 内网地址：http://19.104.40.37:6080
+        // 测试地址：http://12345v2.alltosea.com:6080/
+        target: 'http://19.104.40.37:8082/',
+        // target: 'http://12345v2.alltosea.com:6080/',
+        //是否跨域 
+        changeOrigin: true, 
+        pathRewrite: {
+          '^/api': '/api'
+        }
+    }
+    },
 
     // Various Dev Server settings
 

@@ -27,7 +27,8 @@ axios.interceptors.request.use(config => {
   // 中文转为decode编码
   config.url = encodeURI(config.url)
   // 设置公共URL http://12345v2.alltosea.com:6080/api
-  config.baseURL = process.env.NODE_ENV === 'development' ? 'http://19.104.40.37:8082/api' : '/api'
+  // config.baseURL = process.env.NODE_ENV === 'development' ? 'http://19.104.40.37:8082/api' : '/api'
+  config.baseURL = '/api'
   // 存入baseURL
   store.dispatch('setBaseUrl', 'http://19.104.40.37:8082/api')
   // 如果url包含admin/user/sysUser则需要添加tokenid和userAgent
