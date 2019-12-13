@@ -261,7 +261,7 @@ export default {
       const params = obj2formdatastr({
         page: this.listQuery.page - 1,
         size: this.listQuery.limit,
-        like_account: this.listQuery.account,
+        eq_account: this.listQuery.account,
         like_fullname: this.listQuery.fullname,
       })
       request( `/admin/user/sysUser/search?` + params ).then(data => {

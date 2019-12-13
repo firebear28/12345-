@@ -11,9 +11,9 @@
       <el-select v-model="listQuery.type" placeholder="请选择专题" clearable style="width: 140px" class="filter-item" @change="changeTopics">
         <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
       </el-select>
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button> -->
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button> -->
+      <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button> -->
     </div>
 
     <el-table
@@ -26,8 +26,8 @@
       @sort-change="sortChange">
       <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
       <el-table-column label="主键" prop="bid" min-width="200"/>
-      <el-table-column label="网站地址" prop="address" width="300"/>
-      <el-table-column label="网站名称" prop="webName" width="300"/>
+      <el-table-column label="网站地址" prop="address" min-width="300"/>
+      <el-table-column label="网站名称" prop="webName" min-width="300"/>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
@@ -41,7 +41,7 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" class="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px">
-        <el-form-item label="主键" prop="bid">
+        <el-form-item v-if="dialogStatus !== 'create'" label="主键" prop="bid">
           <el-input v-model="temp.bid"/>
         </el-form-item>
         <el-form-item label="网站地址" prop="address">
@@ -211,7 +211,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-      reqDelete('/sg/item/sgSentimentAddress/' + row.bid).then(data => {
+      return reqDelete('/sg/item/sgSentimentAddress/' + row.bid).then(data => {
         this.$notify({
           title: '成功',
           message: '删除成功',
@@ -221,7 +221,7 @@ export default {
         const index = this.list.indexOf(row)
         this.list.splice(index, 1)
       })
-      row.status = status
+      // row.status = status
       })
     },
     sortChange(data) {
@@ -254,18 +254,20 @@ export default {
       })
     },
     createData() {
-      const params = obj2formdatastr(this.temp)
-      this.$refs['dataForm'].validate((valid) => {
+      // return console.log(this.temp)
+      this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          post('/sg/item/sgSentimentAddress/add?' + params).then(data => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
+          const params = {
+            bid: '',
+            address: this.temp.address,
+            webName: this.temp.webName,
+          }
+          post('/sg/item/sgSentimentAddress/', params).then(data => {
+            if (data.code === 200) {
+              this.getList()
+              this.$message.success('创建成功！')
+              this.dialogFormVisible = false
+            }
           })
         }
       })
@@ -279,18 +281,20 @@ export default {
       })
     },
     updateData() {
-      const params = obj2formdatastr(this.temp)
-      this.$refs['dataForm'].validate((valid) => {
+      // return console.log(this.temp)
+      this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          put('/sg/item/sgSentimentAddress/update?' + params).then(data => {
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
-            this.getList()
+          const params = {
+            bid: this.temp.bid,
+            address: this.temp.address,
+            webName: this.temp.webName,
+          }
+          post('/sg/item/sgSentimentAddress/', params).then(data => {
+            if (data.code === 200) {
+              this.getList()
+              this.$message.success('修改成功！')
+              this.dialogFormVisible = false
+            }
           })
         }
       })
@@ -304,6 +308,7 @@ export default {
           duration: 2000
         })
         const index = this.list.indexOf(row)
+        console.log(index)
         this.list.splice(index, 1)
       })
     },

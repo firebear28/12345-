@@ -23,7 +23,7 @@
       </div>
       <div class="filter-items">
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
-        <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button> -->
+        <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button>
         <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
       </div>
     </div>
@@ -56,7 +56,7 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" class="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px">
         <el-form-item label="主部门：" prop="departName">
-          <SelectScroll ref="selectDepa" url="sg/department/sgMainDepartment/searchDistinctDepart?" rows="rows" objkey="departName" search="like_departName" total="total" emit="setItemName" @setItemName="setItemName"/>
+          <SelectScroll ref="selectDepa" url="sg/department/sgMainDepartment/searchDistinctDepart?" rows="rows" objkey="departName" search="like_departName" searchKey="departId" total="total" emit="setItemName" @setItemName="setItemName"/>
         </el-form-item>
         <el-form-item label="系统：" prop="subName">
           <span v-if="dialogStatus === 'update'">{{ temp.subName }}</span>
@@ -65,7 +65,9 @@
           </el-select>
         </el-form-item>
         <el-form-item label="系统部门：" prop="subDepartName">
-          <el-input v-model="temp.subDepartName"/>
+          <span v-if="dialogStatus === 'update'">{{ temp.subDepartName }}</span>
+          <!-- <el-input v-model="temp.subDepartName"/> -->
+          <SelectScroll v-else ref="selectSubDepa" url="sg/department/sgMainDepartment/searchDistinctSubDepart?" rows="rows" objkey="subDepartName" search="like_subDepartName" searchKey="subDepartId" total="total" emit="setSubItemName" @setSubItemName="setSubItemName"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -127,7 +129,6 @@ export default {
         departName: '',
         subDepartName: '',
         subName: '',
-        isNew: true,
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -149,6 +150,7 @@ export default {
     dialogFormVisible(v) {
       if(v === false){
         this.$refs.selectDepa.clear();
+        this.$refs.selectSubDepa.clear();
       }
     }
   },
@@ -180,8 +182,11 @@ export default {
       return (index + 1) + 10 * (this.listQuery.page - 1)
     },
     setItemName(v) {
-      // console.log(v)
       this.temp.departName = v
+    },
+    setSubItemName(v) {
+      // console.log(v)
+      this.temp.subDepartName = v
     },
     handleFilter() {
       this.listQuery.page = 1
@@ -208,7 +213,6 @@ export default {
         departName: '',
         subDepartName: '',
         subName: '',
-        isNew: true,
       }
     },
     handleCreate() {
@@ -220,18 +224,34 @@ export default {
       })
     },
     createData() {
-      const params = obj2formdatastr(this.temp)
+      // return console.log(this.temp)
+      const params = {
+        id: '',
+        departId: this.temp.departId,
+        departName: this.temp.departName,
+        subName: this.temp.subName,
+      }
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          post('/sg/department/sgMainDepartment?' + params).then(data => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
+          post('/sg/department/sgMainDepartment', params).then(data => {
+            if(data.code === 200){
+              // this.list.unshift(this.temp)
+              this.dialogFormVisible = false
+              this.$notify({
+                title: '成功',
+                message: '创建成功',
+                type: 'success',
+                duration: 2000
+              })
+            }else{
+              this.$notify({
+                title: '错误',
+                message: data.message,
+                type: 'error',
+                duration: 2000
+              })
+            }
+            this.getList()
           })
         }
       })
@@ -252,6 +272,7 @@ export default {
         id: this.temp.id,
         departId: this.temp.departId,
         departName: this.temp.departName,
+        subName: this.temp.subName,
       }
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {

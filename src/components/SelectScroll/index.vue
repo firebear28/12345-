@@ -16,12 +16,13 @@
       :objkey="objkey"
       :objname="objname"
       :search="search"
+      :searchKey="searchKey"
       :total="total"
       :emit="emit"
     >
       <el-option
         v-for="(item) in options"
-        :key="item[objkey]"
+        :key="item[searchKey]"
         :label="item[objkey]"
         :value="item[objkey]"
       />
@@ -40,6 +41,7 @@ export default {
     objkey: '',       // options中对象的key
     objname: '',      // options中对象的name
     search: '',       // 下拉搜索的参数名
+    searchKey: '',    // 下拉for循环的key
     emit: '',         // 传给父组件的方法名
   },
   data() {

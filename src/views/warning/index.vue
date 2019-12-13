@@ -7,7 +7,7 @@
       </div>
       <div class="filter-items">
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
-        <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button> -->
+        <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button>
       </div>
     </div>
 
@@ -20,13 +20,17 @@
       style="width: 100%;">
       <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
       <el-table-column label="部门" prop="departName" min-width="200"/>
-      <el-table-column label="逾期数预警值" prop="cardAlarm" width="200"/>
       <el-table-column label="总数预警值" prop="countAlarm" min-width="100"/>
-      <el-table-column label="办结率预警值" prop="doneAlarm" width="200"/>
-      <el-table-column label="满意度预警值" prop="satisfyAlarm" width="250"/>
-      <el-table-column label="操作" align="center" width="100" class-name="small-padding fixed-width">
+      <el-table-column label="逾期数预警值" prop="cardAlarm" min-width="120"/>
+      <el-table-column label="办结率预警值" prop="doneAlarm" min-width="120"/>
+      <el-table-column label="满意度预警值" prop="satisfyAlarm" min-width="120"/>
+      <el-table-column label="环比黄色预警值" prop="countQoqYellowAlarm" min-width="120"/>
+      <el-table-column label="环比红色预警值" prop="countQoqRedAlarm" min-width="120"/>
+      <el-table-column label="同比黄色预警值" prop="countYoyYellowAlarm" min-width="120"/>
+      <el-table-column label="同比红色预警值" prop="countYoyRedAlarm" min-width="120"/>
+      <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <!-- <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button> -->
+          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">删除
           </el-button>
         </template>
@@ -39,6 +43,7 @@
       <el-form ref="dataForm" class="dataForm" :rules="rules" :model="temp" label-position="left" label-width="140px">
         <el-form-item label="部门" prop="departName">
           <span v-if="dialogStatus === 'update'">{{ temp.departName }}</span>
+          <SelectScroll v-else ref="selectDepa" url="sg/department/sgMainDepartment/searchDistinctDepart?" rows="rows" objkey="departName" objname="departId" search="like_departName" searchKey="departId" total="total" emit="setItemName" @setItemName="setItemName"/>
         </el-form-item>
         <el-form-item label="总数预警值" prop="countAlarm">
           <el-input v-model="temp.countAlarm"/>
@@ -51,6 +56,18 @@
         </el-form-item>
         <el-form-item label="办结率预警值" prop="doneAlarm">
           <el-input v-model="temp.doneAlarm"/>
+        </el-form-item>
+        <el-form-item label="环比黄色预警值" prop="countQoqYellowAlarm">
+          <el-input v-model="temp.countQoqYellowAlarm"/>
+        </el-form-item>
+        <el-form-item label="环比红色预警值" prop="countQoqRedAlarm">
+          <el-input v-model="temp.countQoqRedAlarm"/>
+        </el-form-item>
+        <el-form-item label="同比黄色预警值" prop="countYoyYellowAlarm">
+          <el-input v-model="temp.countYoyYellowAlarm"/>
+        </el-form-item>
+        <el-form-item label="同比红色预警值" prop="countYoyRedAlarm">
+          <el-input v-model="temp.countYoyRedAlarm"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -79,10 +96,11 @@ import { parseTime } from '@/utils'
 import { request, post, reqDelete } from '@/utils/req.js'
 import { obj2formdatastr } from '@/utils/utils.js'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+import SelectScroll from '@/components/SelectScroll' // 无限滚动下拉组建
 
 export default {
   name: 'ComplexTable',
-  components: { Pagination },
+  components: { Pagination, SelectScroll },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -134,6 +152,13 @@ export default {
   created() {
     this.getList()
   },
+  watch: {
+    dialogFormVisible(v) {
+      if(v === false){
+        this.$refs.selectDepa.clear();
+      }
+    }
+  },
   methods: {
     getList() {
       this.listLoading = true
@@ -155,9 +180,9 @@ export default {
     indexMethod(index) {
       return (index + 1) + 10 * (this.listQuery.page - 1)
     },
-    changeTopics() {
-      // 路由跳转
-      this.$router.push({ path: '/' + this.listQuery.type + '/index' })
+    setItemName(obj) {
+      this.temp.departName = obj.departName
+      this.temp.departId = obj.departId
     },
     handleFilter() {
       this.listQuery.page = 1
@@ -185,9 +210,7 @@ export default {
 
     resetTemp() {
       this.temp = {
-        bid: '',
-        address: '',
-        webName: ''
+        
       }
     },
     handleCreate() {
@@ -199,18 +222,38 @@ export default {
       })
     },
     createData() {
-      const params = obj2formdatastr(this.temp)
+      const params = {
+        departId: this.temp.departId,
+        countAlarm: this.temp.countAlarm,
+        cardAlarm: this.temp.cardAlarm,
+        satisfyAlarm: this.temp.satisfyAlarm,
+        doneAlarm: this.temp.doneAlarm,
+        countQoqYellowAlarm: this.temp.countQoqYellowAlarm,
+        countQoqRedAlarm: this.temp.countQoqRedAlarm,
+        countYoyYellowAlarm: this.temp.countYoyYellowAlarm,
+        countYoyRedAlarm: this.temp.countYoyRedAlarm,
+      }
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          post('/sg/item/sgSentimentAddress/add?' + params).then(data => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
+          post('/sg/department/sgDepartmentAlarm/', params).then(data => {
+            if(data.code === 200){
+              // this.list.unshift(this.temp)
+              this.dialogFormVisible = false
+              this.$notify({
+                title: '成功',
+                message: '新增成功',
+                type: 'success',
+                duration: 2000
+              })
+            }else{
+              this.$notify({
+                title: '错误',
+                message: data.message,
+                type: 'error',
+                duration: 2000
+              })
+            }
+            this.getList()
           })
         }
       })
@@ -232,6 +275,10 @@ export default {
         cardAlarm: this.temp.cardAlarm,
         satisfyAlarm: this.temp.satisfyAlarm,
         doneAlarm: this.temp.doneAlarm,
+        countQoqYellowAlarm: this.temp.countQoqYellowAlarm,
+        countQoqRedAlarm: this.temp.countQoqRedAlarm,
+        countYoyYellowAlarm: this.temp.countYoyYellowAlarm,
+        countYoyRedAlarm: this.temp.countYoyRedAlarm,
       }
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {

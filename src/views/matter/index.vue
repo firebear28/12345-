@@ -3,7 +3,7 @@
     <div class="filter-container">
       <div class="filter-items">
         <span>主事项名称：</span>
-        <el-input v-model="listQuery.like_ItemName" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
+        <el-input v-model="listQuery.like_itemName" placeholder="请输入" class="filter-item" @keyup.enter.native="handleFilter"/>
       </div>
       <div class="filter-items">
         <span>名称：</span>
@@ -23,7 +23,7 @@
       </div>
       <div class="filter-items">
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
-        <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button> -->
+        <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button>
         <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
       </div>
     </div>
@@ -44,8 +44,7 @@
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">删除
-          </el-button>
+          <el-button size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -55,7 +54,7 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" class="dataForm" :rules="rules" :model="temp" label-position="left" label-width="140px">
         <el-form-item label="主事项名称" prop="itemName">
-          <SelectScroll ref="selectItem" url="sg/twoconitem/getDistinctItem?" rows="rows" objkey="itemName" search="like_ItemName" total="total" emit="setItemName" @setItemName="setItemName"/>
+          <SelectScroll ref="selectItem" url="sg/twoconitem/getDistinctItem?" rows="rows" objkey="itemName" search="like_itemName" searchKey="itemId" total="total" emit="setItemName" @setItemName="setItemName"/>
         </el-form-item>
         <el-form-item label="来源" prop="subName">
           <span v-if="dialogStatus === 'update'">{{ temp.subName }}</span>
@@ -64,7 +63,8 @@
           </el-select>
         </el-form-item>
         <el-form-item label="事项名称" prop="subItemName">
-          <span>{{ temp.subItemName }}</span>
+          <span v-if="dialogStatus === 'update'">{{ temp.subItemName }}</span>
+          <SelectScroll v-else ref="selectSubDepa" url="sg/twoconitem/getDistinctSubItem?" rows="rows" objkey="subItemName" search="like_subItemName" searchKey="subItemId" total="total" emit="setSubItemName" @setSubItemName="setSubItemName"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -127,7 +127,7 @@ export default {
         page: 1,
         limit: 10,
         like_subItemName: '',
-        like_ItemName: '',
+        like_itemName: '',
         eq_subIden: '',
         null_itemId: '',
       },
@@ -162,6 +162,7 @@ export default {
     dialogFormVisible(v) {
       if(v === false){
         this.$refs.selectItem.clear();
+        this.$refs.selectSubDepa.clear();
       }
     }
   },
@@ -173,7 +174,7 @@ export default {
       this.listLoading = true
       const params = obj2formdatastr({
         like_subItemName: this.listQuery.like_subItemName,
-        like_ItemName: this.listQuery.like_ItemName,
+        like_itemName: this.listQuery.like_itemName,
         eq_subIden: this.listQuery.eq_subIden,
         null_itemId: this.listQuery.null_itemId,
         page: this.listQuery.page - 1,
@@ -195,6 +196,9 @@ export default {
     setItemName(v) {
       // console.log(v)
       this.temp.itemName = v
+    },
+    setSubItemName(v) {
+      this.temp.subDepartName = v
     },
     handleFilter() {
       this.listQuery.page = 1
@@ -236,18 +240,20 @@ export default {
       })
     },
     createData() {
-      const params = obj2formdatastr(this.temp)
-      this.$refs['dataForm'].validate((valid) => {
+      this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          post('/sg/twoconitem/add?' + params).then(data => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
+          const params = {
+            mid: '',
+            itemId: this.temp.itemId,
+            itemName: this.temp.itemName,
+            subName: this.temp.subName,
+          }
+          post('/sg/twoconitem/', params).then(data => {
+            if (data.code === 200) {
+              this.getList()
+              this.$message.success('创建成功！')
+              this.dialogFormVisible = false
+            }
           })
         }
       })
@@ -269,6 +275,7 @@ export default {
             mid: this.temp.mid,
             itemId: this.temp.itemId,
             itemName: this.temp.itemName,
+            subName: this.temp.subName,
           }
           post('/sg/twoconitem/', params).then(data => {
             if (data.code === 200) {
@@ -282,7 +289,7 @@ export default {
     },
     handleDelete(row) {
       reqDelete('/sg/twoconitem/' + row.mid).then(data => {
-        this.list.unshift(this.temp)
+        // this.list.unshift(this.temp)
         this.dialogFormVisible = false
         this.$notify({
           title: '成功',

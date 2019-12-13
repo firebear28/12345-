@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
-    <!-- <div class="filter-container">
-      ID查询：
+    <div class="filter-container">
+      <!-- ID查询：
       <el-input v-model="listQuery.id" placeholder="请输入订单编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       名称：
       <el-select v-model="listQuery.state" placeholder="请选择名称" clearable class="filter-item" style="width: 130px" @change="getList">
@@ -11,10 +11,10 @@
       <el-select v-model="listQuery.type" placeholder="请选择专题" clearable style="width: 140px" class="filter-item" @change="changeTopics">
         <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key"/>
       </el-select>
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button> -->
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增</el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button>
-    </div> -->
+      <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">导出</el-button> -->
+    </div>
 
     <el-table
       v-loading="listLoading"
@@ -26,8 +26,8 @@
       @sort-change="sortChange">
       <el-table-column :index="indexMethod" type="index" label="序号" sortable="custom" align="center" width="75"/>
       <el-table-column label="主键" prop="bid" min-width="200"/>
-      <el-table-column label="关键字" prop="keyword" width="300"/>
-      <el-table-column label="关键字类别" prop="type" width="300"/>
+      <el-table-column label="关键字" prop="keyword" min-width="300"/>
+      <el-table-column label="关键字类别" prop="type" min-width="300"/>
       <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
@@ -41,8 +41,9 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" class="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px">
-        <el-form-item label="主键" prop="bid">
-          <el-input v-model="temp.bid"/>
+        <el-form-item v-if="dialogStatus !== 'create'" label="主键" prop="bid">
+          <!-- <el-input v-model="temp.bid"/> -->
+          <span>{{temp.bid}}</span>
         </el-form-item>
         <el-form-item label="关键字" prop="keyword">
           <el-input v-model="temp.keyword"/>
@@ -211,17 +212,17 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-      reqDelete('/sg/item/sgSentimentKeyword/' + row.bid).then(data => {
-        this.$notify({
-          title: '成功',
-          message: '删除成功',
-          type: 'success',
-          duration: 2000
+        return reqDelete('/sg/item/sgSentimentKeyword/' + row.bid).then(data => {
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
+          const index = this.list.indexOf(row)
+          this.list.splice(index, 1)
         })
-        const index = this.list.indexOf(row)
-        this.list.splice(index, 1)
-      })
-      row.status = status
+        // row.status = status
       })
     },
     sortChange(data) {
@@ -254,18 +255,20 @@ export default {
       })
     },
     createData() {
-      const params = obj2formdatastr(this.temp)
-      this.$refs['dataForm'].validate((valid) => {
+      // return console.log(this.temp)
+      this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          post('/sg/item/sgSentimentKeyword/add?' + params).then(data => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
+          const params = {
+            bid: '',
+            keyword: this.temp.keyword,
+            type: this.temp.type,
+          }
+          post('/sg/item/sgSentimentKeyword/', params).then(data => {
+            if (data.code === 200) {
+              this.getList()
+              this.$message.success('创建成功！')
+              this.dialogFormVisible = false
+            }
           })
         }
       })
@@ -279,24 +282,26 @@ export default {
       })
     },
     updateData() {
-      const params = obj2formdatastr(this.temp)
-      this.$refs['dataForm'].validate((valid) => {
+      // return console.log(this.temp)
+      this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          put('/sg/item/sgSentimentKeyword/update?' + params).then(data => {
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
-            this.getList()
+          const params = {
+            bid: this.temp.bid,
+            keyword: this.temp.keyword,
+            type: this.temp.type,
+          }
+          post('/sg/item/sgSentimentKeyword/', params).then(data => {
+            if (data.code === 200) {
+              this.getList()
+              this.$message.success('修改成功！')
+              this.dialogFormVisible = false
+            }
           })
         }
       })
     },
     handleDelete(row) {
-      request('/sg/item/sgSentimentKeyword/' + row.bid).then(data => {
+      reqDelete('/sg/item/sgSentimentKeyword/' + row.bid).then(data => {
         this.$notify({
           title: '成功',
           message: '删除成功',

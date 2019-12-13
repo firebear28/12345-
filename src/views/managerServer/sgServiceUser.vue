@@ -42,13 +42,13 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" class="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px">
         <el-form-item label="服务名称" prop="subItemName">
-          <SelectScroll ref="selectServer" url="sg/base/sgService/queryByPage?" rows="content" objkey="serviceName" objname="serviceId" search="like_serviceName" total="totalElements" emit="setServer" @setServer="setServer"/>
+          <SelectScroll ref="selectServer" url="sg/base/sgService/queryByPage?" rows="content" objkey="serviceName" objname="serviceId" search="like_serviceName" searchKey="serviceId" total="totalElements" emit="setServer" @setServer="setServer"/>
         </el-form-item>
         <!-- <el-form-item label="服务名称" prop="subItemName">
           <span>{{ temp.serviceName }}</span>
         </el-form-item> -->
         <el-form-item label="用户名称" prop="subItemName">
-          <SelectScroll ref="selectAccount" url="/admin/user/sysUser/search?" rows="rows" objkey="fullname" objname="account" search="like_fullname" total="total" emit="setAccount" @setAccount="setAccount"/>
+          <SelectScroll ref="selectAccount" url="/admin/user/sysUser/search?" rows="rows" objkey="fullname" objname="account" search="like_fullname" searchKey="userid" total="total" emit="setAccount" @setAccount="setAccount"/>
         </el-form-item>
         <!-- <el-form-item label="用户名称" prop="subItemName">
           <span>{{ temp.userFullname }}</span>
