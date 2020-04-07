@@ -24,14 +24,6 @@
           icon="el-icon-edit"
           @click="handleCreate"
         >新增</el-button>
-        <!-- <el-button
-          v-waves
-          :loading="downloadLoading"
-          class="filter-item"
-          type="primary"
-          icon="el-icon-download"
-          @click="handleDownload"
-        >导出</el-button>-->
       </div>
     </div>
 
@@ -76,20 +68,30 @@
         <el-form-item label="名称" prop="fullname">
           <el-input v-model="temp.fullname" />
         </el-form-item>
-        <!-- <el-form-item label="账号类型" prop="accounttype">
-          <el-input v-model="temp.accounttype" />
-        </el-form-item> -->
+        <el-form-item label="身份证" prop="idNumber">
+          <el-input v-model="temp.idNumber" />
+        </el-form-item>
         <el-form-item label="登录账号" prop="account">
           <el-input v-model="temp.account" />
         </el-form-item>
-        <!-- <el-form-item label="密码" prop="password">
+        <el-form-item label="密码" prop="password" v-if="dialogStatus != 'update'">
           <el-input v-model="temp.password" />
-        </el-form-item> -->
-        <!-- <el-form-item label="邮件" prop="email">
-          <el-input v-model="temp.email" />
-        </el-form-item> -->
+        </el-form-item>
         <el-form-item label="手机号" prop="mobile">
           <el-input v-model="temp.mobile" />
+        </el-form-item>
+        <el-form-item label="IMEI" prop="phone">
+          <el-input v-model="temp.phone" />
+        </el-form-item>
+        <el-form-item label="状态：" prop="status">
+          <el-select v-model="temp.status" placeholder="请选择状态" clearable style="width:100%">
+            <el-option
+              v-for="item in state"
+              :key="item.key"
+              :label="item.label"
+              :value="item.key"
+            />
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -147,6 +149,11 @@ import { obj2formdatastr } from '@/utils/utils.js'
 import { getToken, getUserAgent } from '@/utils/auth'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
+const state = [
+  { key: 1, label: '有效' },
+  { key: 0, label: '无效' },
+]
+
 export default {
   name: 'ComplexTable',
   components: { Pagination },
@@ -171,12 +178,15 @@ export default {
         isNew: true,
         userid: '',
         fullname: '',
-        accounttype: '',
+        idNumber: '',
         account: '',
         password: '',
-        email: '',
-        mobile: ''
+        phone: '',
+        mobile: '',
+        status: 1
       },
+      // 状态切换
+      state,
       // 新建、编辑表单
       dialogFormVisible: false,
       // ip管理
@@ -190,6 +200,7 @@ export default {
       rules: {
         fullname: [{ required: true, message: '名称不能为空', trigger: 'blur' }],
         account: [{ required: true, message: '账号不能为空', trigger: 'blur' }],
+        password: [{ required: true, message: '密码不能为空', trigger: 'blur' }],
         mobile: [{ required: true, message: '手机号不能为空', trigger: 'blur' }]
       },
       downloadLoading: false
@@ -318,7 +329,8 @@ export default {
         account: '',
         password: '',
         email: '',
-        mobile: ''
+        mobile: '',
+        status: 1
       }
     },
     handleCreate() {
@@ -334,11 +346,13 @@ export default {
         if (valid) {
           const data = {
             isNew: true,
-            userid: this.temp.userid,
             account: this.temp.account,
+            password: this.temp.password,
             fullname: this.temp.fullname,
-            email: this.temp.email,
             mobile: this.temp.mobile,
+            idNumber: this.temp.idNumber,
+            status: this.temp.status,
+            phone: this.temp.phone
           }
           const params = obj2formdatastr(data)
           post(`/admin/user/sysUser?` + params).then(data => {
@@ -370,8 +384,10 @@ export default {
             userid: this.temp.userid,
             account: this.temp.account,
             fullname: this.temp.fullname,
-            email: this.temp.email,
             mobile: this.temp.mobile,
+            idNumber: this.temp.idNumber,
+            status: this.temp.status,
+            phone: this.temp.phone
           }
           const params = obj2formdatastr(data)
           post(`/admin/user/sysUser?` + params).then(data => {
@@ -403,7 +419,7 @@ export default {
         month: '201812',
         pageNumber: this.listQuery.page,
         pageSize: this.listQuery.limit,
-        state: this.listQuery.state,
+        status: this.listQuery.status,
         property: 'acceptTime',
         direction: 'DESC'
       })

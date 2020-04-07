@@ -20,9 +20,6 @@ const getPureUrl = (url, start = 0) => {
 
 // 添加请求拦截器，动态设置参数
 axios.interceptors.request.use(config => {
-  // 合并请求头 authority-token
-  // config.headers = Object.assign({}, config.headers, { 'tokenid': getToken() })
-  // config.headers = Object.assign({}, config.headers, { 'userAgent': getUserAgent() })
 
   // 中文转为decode编码
   config.url = encodeURI(config.url)
